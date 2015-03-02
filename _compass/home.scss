@@ -1,0 +1,171 @@
+/* Welcome to Compass.
+ * In this file you should write your main styles. (or centralize your imports)
+ * Import this file using the following HTML or equivalent:
+ * <link href='/stylesheets/home.css' media='screen, projection' rel='stylesheet' type='text/css' /> */
+
+@import 'compass/reset';
+@import 'compass/css3/images';
+@import 'compass/css3/transition';
+
+
+// My partials.
+@import 'main';
+@import 'grid';
+
+
+// Colors.
+$color-light-white: #fff;
+$color-dark-white: #fdeae8;
+$color-link: #ffff66;
+
+// Other variables.
+$footer-height: 110px;
+
+
+body {
+	font-family: 'Open Sans';
+	background-color: #f26b59;
+}
+
+html,
+body {
+	height: 100%;
+}
+
+
+.page-wrapper {
+	position: relative;
+	min-height: 100%;
+	margin-bottom: -1 * $footer-height;
+
+	&:after {
+		content: '';
+		display: block;
+		height: $footer-height;
+	}
+}
+
+
+.banner-container {
+	background-color: #ea362c; // Old browsers
+	@include filter-gradient(#ea362c, #f26b59, vertical); // IE6-9
+	@include background-image(linear-gradient(top,  #ea362c 0%,#f26b59 100%));
+
+	.banner {
+		max-width: 800px;
+		width: 90%;
+		margin: auto;
+		padding: 3rem 2rem 0 2rem;
+
+		> h1 {
+			font-family: 'Poiret One';
+			font-size: 6rem;
+			color: $color-light-white;
+
+			span.double-o {
+				letter-spacing: -0.6rem;
+			}
+		}
+
+		> h2 {
+			line-height: 150%;
+			font-family: 'Poiret One';
+			font-size: 2.5rem;
+			color: $color-dark-white;
+		}
+
+		> pre.install {
+			margin: 4rem auto;
+			width: 50%;
+			min-width: 300px;
+
+			code {
+				display: block;
+				padding: 1rem 1.5rem;
+				text-shadow: 0 1px white;
+				font-family: Consolas, Monaco, 'Andale Mono', monospace;
+				font-size: 0.9rem;
+				white-space: pre;
+				color: #333;
+				background: #f1f1f1;
+				border: 1px solid #e1e1e1;
+				border-radius: 4px;
+			}
+		}
+	}
+}
+
+.boxes {
+	margin-bottom: 2rem;
+
+	.box {
+		margin-bottom: 2rem;
+		padding: 0 10px;
+
+		h4 {
+			color: $color-light-white;
+			border-bottom: 1px solid #d65248;
+		}
+
+		p {
+			margin-bottom: 0.6rem;
+			color: $color-dark-white;
+		}
+
+		a {
+			text-decoration: none;
+			color: $color-link;
+			border-bottom: 1px solid transparent;
+			@include transition-duration(0.25s);
+
+			&:hover {
+				border-color: $color-link;
+			}
+		}
+	}
+}
+
+.footer {
+	$padding: 20px;
+	$line-height: ($footer-height - $padding * 2) / 2;
+
+	box-sizing: border-box;
+	width: 100%;
+	min-height: $footer-height;
+	padding: $padding 0;
+	background: #382a29;
+
+	.grid {
+		max-width: 500px;
+	}
+
+	iframe.github {
+		width: 120px;
+		height: 20px;
+		margin-top: 8px;
+	}
+
+	p {
+		text-align: center;
+		color: $color-dark-white;
+		font-size: 0.9rem;
+		line-height: $line-height;
+		border-bottom: 1px solid #281a19;
+		@include transition-duration(0.25s);
+
+		&:hover {
+			border-color: #f26b59;
+		}
+
+		&.copyright {
+			font-size: 0.75rem;
+			color: #9d8a88;
+			border: none;
+		}
+
+		a {
+			color: inherit;
+			text-decoration: none;
+		}
+	}
+}
