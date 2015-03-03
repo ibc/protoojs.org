@@ -7,6 +7,7 @@
 @import 'compass/css3/box-sizing';
 @import 'compass/css3/images';
 @import 'compass/css3/transition';
+@import 'compass/css3/transform';
 
 
 // My partials.
@@ -15,8 +16,10 @@
 
 
 // Colors.
-$color-light-white: #fff;
-$color-dark-white: #fdeae8;
+$color-brown-dark: #331b1b;
+$color-brown-light: #6d3134;
+$color-white-light: #fff;
+$color-white-dark: #fdeae8;
 $color-link: #ffff66;
 
 // Other variables.
@@ -30,24 +33,112 @@ html {
 
 body {
 	height: 100%;
-	font-family: 'Open Sans';
-	background-color: #ea362c; // Old browsers
-	@include filter-gradient(#ea362c, #f26b59, vertical); // IE6-9
-	@include background-image(linear-gradient(top,  #ea362c 0%,#f26b59 50%));
-
 	margin-bottom: $footer-height;
+	font-family: 'Open Sans';
+
+	// Lidia inspiration!
+	// @include background-image(linear-gradient(top, #3c1e1f 0%,#ab383f 50%));
+
+	background-color: #79292c; // Old browsers
+	@include filter-gradient(#79292c, #d3414b, vertical); // IE6-9
+	@include background-image(linear-gradient(top, #79292c 0%,#d3414b 50%));
 }
 
 
+/* Menu
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+.menu {
+	$item-height: 5.5rem;
+	$num-items: 4;
+
+	position: absolute;
+	z-index: 10;
+	top: -1 * $item-height;
+	width: 100%;
+	margin: 0 auto;
+	@include transition-duration(0.25s);
+	background: shade($color-brown-dark, 25%);
+
+	@media (max-width: 549px) {
+		top: -1 * ($item-height * $num-items);
+
+		.grid .item a {
+			border-bottom: 1px solid $color-brown-light !important;
+
+			&.last {
+				border: none !important;
+			}
+		}
+	}
+
+	.grid {
+		max-width: 750px;
+		width: 90%;
+
+		.item {
+			a {
+				@include box-sizing(border-box);
+				// @include transition-duration(0.25s);
+				@include transition-duration(0.5s);
+				display: block;
+				height: $item-height;
+				line-height: $item-height;
+				font-size: 1.1rem;
+				text-align: center;
+				text-decoration: none;
+				border-bottom: 0px solid #fff;
+				color: shade($color-white-dark, 25);
+
+				&:hover {
+					color: $color-white-light;
+					border-bottom: $item-height solid transparent;
+				}
+			}
+		}
+	}
+
+	.icon-wrapper {
+		position: absolute;
+		width: 100%;
+		height: 0;
+
+		.icon {
+			@include transition-duration(0.25s);
+			max-width: 750px;
+			width: 90%;
+			margin: 0 auto;
+			height: $item-height;
+			opacity: 0.9;
+			background: center right url(/images/menu.png) no-repeat;
+			background-size: $item-height / 2;
+		}
+	}
+
+	&:hover {
+		top: 0;
+
+		.icon-wrapper .icon {
+			height: 0;
+			// opacity: 0;
+			background-size: 0;
+		}
+	}
+}
+
+
+/* Banner
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
 .banner {
-	max-width: 800px;
+	max-width: 750px;
 	width: 90%;
-	margin: 3rem auto;
+	margin: 6rem auto 4rem;
 
 	> h1 {
 		font-family: 'Poiret One';
 		font-size: 6rem;
-		color: $color-light-white;
+		color: $color-white-light;
 
 		span.double-o {
 			letter-spacing: -0.6rem;
@@ -58,7 +149,7 @@ body {
 		line-height: 150%;
 		font-family: 'Poiret One';
 		font-size: 2.5rem;
-		color: $color-dark-white;
+		color: $color-white-dark;
 	}
 
 	> pre.install {
@@ -82,28 +173,36 @@ body {
 }
 
 
+/* Boxes
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
 .boxes {
 	margin-bottom: 4rem;
+
+	// // Fix footer height.
+	// @media (max-width: 549px) {
+	// 	margin-bottom: 10rem;
+	// }
 
 	.box {
 		margin-bottom: 2rem;
 		padding: 0 10px;
 
 		h4 {
-			color: $color-light-white;
-			border-bottom: 1px solid #d65248;
+			color: $color-white-light;
+			border-bottom: 1px solid #751f27;
 		}
 
 		p {
 			margin-bottom: 0.6rem;
-			color: $color-dark-white;
+			color: $color-white-dark;
 		}
 
 		a {
+			@include transition-duration(0.25s);
 			text-decoration: none;
 			color: $color-link;
 			border-bottom: 1px solid transparent;
-			@include transition-duration(0.25s);
 
 			&:hover {
 				border-color: $color-link;
@@ -113,33 +212,34 @@ body {
 }
 
 
+/* Footer
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
 .footer {
 	$padding: 20px;
 	$line-height: ($footer-height - $padding * 2) / 2;
 
-	@include box-sizing(border-box);
 	position: absolute;
 	bottom: 0;
 	width: 100%;
 	min-height: $footer-height;
+	@include box-sizing(border-box);
 	padding: $padding 0;
-	background: #4a3334;
+	background-color: $color-brown-dark; // Old browsers
+	@include background-image(linear-gradient(left, $color-brown-dark 0%,$color-brown-light 50%,$color-brown-dark 100%));
 
+	// Fix footer height.
+	@media (max-width: 549px) {
+		bottom: -8rem;
+	}
 
 	.grid {
 		max-width: 500px;
 	}
 
-	iframe.github {
-		width: 120px;
-		height: 20px;
-		padding-top: 8px;
-		padding-left: 10px;
-	}
-
 	p {
 		text-align: center;
-		color: $color-dark-white;
+		color: $color-white-dark;
 		font-size: 0.9rem;
 		line-height: $line-height;
 
@@ -149,7 +249,7 @@ body {
 
 		&.copyright {
 			font-size: 0.8rem;
-			color: #9d8a88;
+			color: #c57e75;
 			border: none;
 		}
 
@@ -161,7 +261,7 @@ body {
 			@include transition-duration(0.25s);
 
 			&:hover {
-				border-color: #f26b59;
+				border-color: #d3414b;
 			}
 		}
 	}
