@@ -4,6 +4,7 @@
  * <link href='/stylesheets/home.css' media='screen, projection' rel='stylesheet' type='text/css' /> */
 
 @import 'compass/reset';
+@import 'compass/css3/box-sizing';
 @import 'compass/css3/images';
 @import 'compass/css3/transition';
 
@@ -22,81 +23,67 @@ $color-link: #ffff66;
 $footer-height: 110px;
 
 
-body {
-	font-family: 'Open Sans';
-	background-color: #f26b59;
-}
-
-html,
-body {
-	height: 100%;
-}
-
-
-.page-wrapper {
+html {
 	position: relative;
 	min-height: 100%;
-	margin-bottom: -1 * $footer-height;
-
-	&:after {
-		content: '';
-		display: block;
-		height: $footer-height;
-	}
 }
 
-
-.banner-container {
+body {
+	height: 100%;
+	font-family: 'Open Sans';
 	background-color: #ea362c; // Old browsers
 	@include filter-gradient(#ea362c, #f26b59, vertical); // IE6-9
-	@include background-image(linear-gradient(top,  #ea362c 0%,#f26b59 100%));
+	@include background-image(linear-gradient(top,  #ea362c 0%,#f26b59 50%));
 
-	.banner {
-		max-width: 800px;
-		width: 90%;
-		margin: auto;
-		padding: 3rem 2rem 0 2rem;
+	margin-bottom: $footer-height;
+}
 
-		> h1 {
-			font-family: 'Poiret One';
-			font-size: 6rem;
-			color: $color-light-white;
 
-			span.double-o {
-				letter-spacing: -0.6rem;
-			}
+.banner {
+	max-width: 800px;
+	width: 90%;
+	margin: 3rem auto;
+
+	> h1 {
+		font-family: 'Poiret One';
+		font-size: 6rem;
+		color: $color-light-white;
+
+		span.double-o {
+			letter-spacing: -0.6rem;
 		}
+	}
 
-		> h2 {
-			line-height: 150%;
-			font-family: 'Poiret One';
-			font-size: 2.5rem;
-			color: $color-dark-white;
-		}
+	> h2 {
+		line-height: 150%;
+		font-family: 'Poiret One';
+		font-size: 2.5rem;
+		color: $color-dark-white;
+	}
 
-		> pre.install {
-			margin: 4rem auto;
-			width: 50%;
-			min-width: 300px;
+	> pre.install {
+		margin: 4rem auto;
+		width: 50%;
+		min-width: 300px;
 
-			code {
-				display: block;
-				padding: 1rem 1.5rem;
-				text-shadow: 0 1px white;
-				font-family: Consolas, Monaco, 'Andale Mono', monospace;
-				font-size: 0.9rem;
-				white-space: pre;
-				color: #333;
-				background: #f1f1f1;
-				border: 1px solid #e1e1e1;
-				border-radius: 4px;
-			}
+		code {
+			display: block;
+			padding: 1rem 1.5rem;
+			text-shadow: 0 1px white;
+			font-family: Consolas, Monaco, 'Andale Mono', monospace;
+			font-size: 0.9rem;
+			white-space: pre;
+			color: #333;
+			background: #f1f1f1;
+			border: 1px solid #e1e1e1;
+			border-radius: 4px;
 		}
 	}
 }
 
+
 .boxes {
-	margin-bottom: 2rem;
+	margin-bottom: 4rem;
 
 	.box {
 		margin-bottom: 2rem;
@@ -125,15 +112,19 @@ body {
 	}
 }
 
+
 .footer {
 	$padding: 20px;
 	$line-height: ($footer-height - $padding * 2) / 2;
 
-	box-sizing: border-box;
+	@include box-sizing(border-box);
+	position: absolute;
+	bottom: 0;
 	width: 100%;
 	min-height: $footer-height;
 	padding: $padding 0;
-	background: #382a29;
+	background: #4a3334;
+
 
 	.grid {
 		max-width: 500px;
@@ -142,7 +133,8 @@ body {
 	iframe.github {
 		width: 120px;
 		height: 20px;
-		margin-top: 8px;
+		padding-top: 8px;
+		padding-left: 10px;
 	}
 
 	p {
@@ -150,22 +142,27 @@ body {
 		color: $color-dark-white;
 		font-size: 0.9rem;
 		line-height: $line-height;
-		border-bottom: 1px solid #281a19;
-		@include transition-duration(0.25s);
 
 		&:hover {
 			border-color: #f26b59;
 		}
 
 		&.copyright {
-			font-size: 0.75rem;
+			font-size: 0.8rem;
 			color: #9d8a88;
 			border: none;
 		}
 
 		a {
+			display: block;
 			color: inherit;
 			text-decoration: none;
+			border-bottom: 1px solid #281a19;
+			@include transition-duration(0.25s);
+
+			&:hover {
+				border-color: #f26b59;
+			}
 		}
 	}
 }
