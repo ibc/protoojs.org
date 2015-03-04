@@ -1,269 +1,116 @@
-/* Welcome to Compass.
- * In this file you should write your main styles. (or centralize your imports)
- * Import this file using the following HTML or equivalent:
- * <link href='/stylesheets/home.css' media='screen, projection' rel='stylesheet' type='text/css' /> */
+// Value for some variables used in _base.scss.
+$menu-num-items: 4;
+$menu-item-height: 3.5rem;
+$menu-item-height-mobile: 5.5rem;
 
-@import 'compass/reset';
-@import 'compass/css3/box-sizing';
-@import 'compass/css3/images';
-@import 'compass/css3/transition';
-@import 'compass/css3/transform';
+// Use base style.
+@import 'base';
 
-
-// My partials.
-@import 'main';
-@import 'grid';
-
-
-// Colors.
-$color-red-light: #B74244;
-$color-red-dark: #602F2F;
-$color-white-light: #fff;
-$color-white-dark: #fdeae8;
-$color-brown-dark: #331b1b;
-$color-brown-light: #6d3134;
-$color-link: #ffff66;
-
-// Other variables.
-$footer-height: 110px;
-
-
-html {
-	position: relative;
-	min-height: 100%;
-}
 
 body {
-	height: 100%;
-	margin-bottom: $footer-height;
-	font-family: 'Open Sans';
-
-	// Lidia inspiration!
-	// @include background-image(linear-gradient(top, #3c1e1f 0%,#ab383f 50%));
-
-	background-color: $color-red-dark; // Old browsers
-	@include filter-gradient($color-red-dark, $color-red-light, vertical); // IE6-9
-	@include background-image(linear-gradient(top, $color-red-dark 0%,$color-red-light 50%));
+	background: shade($color-white-light, 8%);
 }
 
 
-/* Menu
+/* Title
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
-.menu {
-	$item-height: 5.5rem;
-	$num-items: 4;
-
-	position: absolute;
-	z-index: 10;
-	top: -1 * $item-height;
+.protoo-title-bar {
 	width: 100%;
-	margin: 0 auto;
-	@include transition-duration(0.25s);
-	background: shade($color-brown-dark, 30%);
+	background: shade($color-red-light, 25%);
 
-	@media (max-width: 549px) {
-		top: -1 * ($item-height * $num-items);
-
-		.grid .item a {
-			border-bottom: 1px solid shade($color-brown-dark, 50%) !important;
-
-			&:hover {
-				border-color: $color-red-light !important;
-			}
-
-			&.last {
-				border: none !important;
-			}
-		}
-	}
-
-	.grid {
+	h1 {
 		max-width: 750px;
 		width: 90%;
-
-		.item {
-			a {
-				@include box-sizing(border-box);
-				// @include transition-duration(0.25s);
-				@include transition-duration(0.5s);
-				display: block;
-				height: $item-height;
-				line-height: $item-height;
-				font-size: 1.1rem;
-				text-align: center;
-				text-decoration: none;
-				border-bottom: 0px solid  $color-white-light;
-				color: shade($color-white-dark, 25%);
-
-				&:hover {
-					color: $color-white-light;
-					border-bottom: $item-height solid transparent;
-				}
-			}
-		}
-	}
-
-	.icon-wrapper {
-		position: absolute;
-		width: 100%;
-		height: 0;
-
-		.icon {
-			@include transition-duration(0.25s);
-			max-width: 750px;
-			width: 90%;
-			margin: 0 auto;
-			height: $item-height;
-			opacity: 0.9;
-			background: center right url(/images/menu.png) no-repeat;
-			background-size: $item-height / 2;
-		}
-	}
-
-	&:hover {
-		top: 0;
-
-		.icon-wrapper .icon {
-			height: 0;
-			background-size: 0;
-		}
-	}
-}
-
-
-/* Banner
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
-
-.banner {
-	max-width: 750px;
-	width: 90%;
-	margin: 5.5rem auto 4rem;
-
-	> h1 {
+		margin: 0 auto;
 		font-family: 'Poiret One';
-		font-size: 6rem;
 		color: $color-white-light;
 
 		span.double-o {
-			letter-spacing: -0.6rem;
+			letter-spacing: -0.3rem;
+		}
+
+		@media (min-width: 550px) {
+			font-size: $menu-item-height / 1.4;
+			height: $menu-item-height;
+			line-height: $menu-item-height * 0.77;
+		}
+
+		@media (max-width: 549px) {
+			font-size: $menu-item-height-mobile / 1.4;
+			height: $menu-item-height-mobile;
+			line-height: $menu-item-height-mobile * 0.77;
 		}
 	}
+}
 
-	> h2 {
-		line-height: 150%;
+
+/* Content
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+.content {
+	padding: 3rem 0;
+
+	// Remove margin-top for first sibling elements.
+	h1 + h2, h1 + h3, h1 + p, h1 + ul, h1 + pre,
+	h2 + h3, h2 + h4, h2 + p, h2 + ul, h2 + pre,
+	h3 + h4, h3 + p, h3 + ul, h3 + pre,
+	h4 + p, h4 + ul, h4 + pre,
+	section + h3, section + h4, section + p, section + ul, section + pre {
+		margin-top: 0 !important;
+	}
+
+	h1 {
 		font-family: 'Poiret One';
-		font-size: 2.5rem;
-		color: $color-white-dark;
+		font-size: 3rem;
+		color: $color-black-dark;
+		margin-bottom: 3rem;
 	}
 
-	> pre.install {
-		margin: 4rem auto;
-		width: 50%;
-		min-width: 300px;
-
-		code {
-			display: block;
-			padding: 1rem 1.5rem;
-			text-shadow: 0 1px white;
-			font-family: Consolas, Monaco, 'Andale Mono', monospace;
-			font-size: 0.9rem;
-			white-space: pre;
-			color: #333;
-			background: #f1f1f1;
-			border: 1px solid #e1e1e1;
-			border-radius: 4px;
-		}
-	}
-}
-
-
-/* Boxes
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
-
-.boxes {
-	margin-bottom: 4rem;
-
-	.box {
-		margin-bottom: 2rem;
-		padding: 0 10px;
-
-		h4 {
-			line-height: 3rem;
-			color: $color-white-light;
-			border-bottom: 1px solid $color-brown-light;
-		}
-
-		p {
-			margin-bottom: 0.6rem;
-			color: $color-white-dark;
-		}
-
-		a {
-			@include transition-duration(0.25s);
-			text-decoration: none;
-			color: $color-link;
-			border-bottom: 1px solid transparent;
-
-			&:hover {
-				border-color: $color-link;
-			}
-		}
-	}
-}
-
-
-/* Footer
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
-
-.footer {
-	$padding: 20px;
-	$line-height: ($footer-height - $padding * 2) / 2;
-
-	position: absolute;
-	bottom: 0;
-	width: 100%;
-	min-height: $footer-height;
-	@include box-sizing(border-box);
-	padding: $padding 0;
-	background-color: $color-brown-dark; // Old browsers
-	@include background-image(linear-gradient(left, $color-brown-dark 0%,$color-brown-light 50%,$color-brown-dark 100%));
-
-	// Fix footer height.
-	@media (max-width: 549px) {
-		bottom: -8rem;
+	h2 {
+		font-size: 2rem;
+		line-height: 3rem;
+		color: $color-black-dark;
+		font-weight: bold;
+		border-bottom: 1px solid $color-red-light;
+		margin-top: 3rem;
+		margin-bottom: 2.5rem;
 	}
 
-	.grid {
-		max-width: 500px;
+	h3 {
+		font-size: 1.75rem;
+		line-height: 2.5rem;
+		color: tint($color-black-light, 15%);
+		font-weight: bold;
+		margin-top: 2.5rem;
+		margin-bottom: 1.75rem;
+	}
+
+	h4 {
+		font-size: 1.3rem;
+		color: $color-black-dark;
+		font-weight: bold;
+		margin-top: 1.75rem;
+		margin-bottom: 1.5rem;
 	}
 
 	p {
-		text-align: center;
-		color: $color-white-dark;
-		font-size: 0.9rem;
-		line-height: $line-height;
-
-		&:hover {
-			border-color: $color-red-light;
-		}
-
-		&.copyright {
-			font-size: 0.8rem;
-			color: #c57e75;
-			border: none;
-		}
-
-		a {
-			display: block;
-			color: inherit;
-			text-decoration: none;
-			border-bottom: 1px solid $color-brown-dark;
-			@include transition-duration(0.25s);
-
-			&:hover {
-				border-color: $color-red-light;
-			}
-		}
+		line-height: 1.5rem;
+		color: $color-black-light;
+		margin-top: 0.75rem;
+		margin-bottom: 0.75rem;
 	}
+
+	pre {
+		border: 1px solid #ddd;
+		margin-top: 0.75rem !important;
+		margin-bottom: 0.75rem !important;
+		margin-left: 0.5rem !important;
+		margin-right: 0.5rem !important;
+	}
+
+	section {
+		padding-left: 1.5rem;
+	}
+
 }
