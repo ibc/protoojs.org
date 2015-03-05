@@ -9,55 +9,46 @@ Protoo is a [Node.js](http://nodejs.org/) signaling framework for building Real-
 
 Protoo defines a signaling protocol based on JSON requests and responses. It is up to the application to define and extend the signaling protocol and the content of requests and responses in order to accomplish the desired feature set.
 
-Protoo integrates well with Node HTTP frameworks such as [Express](http://expressjs.com/). It can also be run as a standalone server.
+Protoo integrates well with Node HTTP frameworks such as [Express](http://expressjs.com/) by sharing the same [httpServer](http://nodejs.org/api/http.html#http_http_createserver_requestlistener) instance, but it can also be run as a standalone server.
 
 
-## Application
+## Peers
 
-Application is blablabla:
+Clients that connect to Protoo are called **peers**. Those peers can be JavaScript applications running in a browser, native apps, etc.
 
-* lalala1
-* lalala2
+A Protoo peer consists on a `username` and a `uuid`:
 
-jeje no?
+* username: The account username of the peer.
+* uuid: A unique identificator.
 
+To better get the whole picture, let's say that Alice can connect to Protoo using a web application and her mobile app at the same time by providing the same `username` ("alice") but different `uuid` values ("jk6jghbd21" and "hvth3bksf").
 
-### Properties
-
-Properties are the following blabla:
-
-<section markdown='1'>
-
-#### property 1
-
-The property 1 is very interesting and blablabal:
-
-```javascript
-var result = function(lala);
-```
-
-Mola eh?
+It is up to the application running Protoo to accept clients' connections and to assign them a `username` and a `uuid`. This process is called **authorization**, and can be achieved in multiple ways (for example by examining the Cookie header of the connection request once a user has logged in into the website).
 
 
-#### property 2
+## Routing
 
-The property 2 is also very interesting, but two points:
+How protocol requests are processed in Protoo is called **routing**. At API level Protoo provides an interface similar to the routing API of [Express](http://expressjs.com/) in which received requests are secuentially processed by all the middlewares loaded into the Protoo application until one of them stop the propagation.
 
-* It is cool:
+
+If you know Express you would probably love this:
 
 ```javascript
-var cool = function(lala);
+var protoo = require('protoo');
+var p2pMessenger = protoo.middleware.p2pMessenger;
+
+var app = protoo();
+
+app.use(function logger(req, next) {
+    console.log('processing %s request', req.method);
+    next();
+});
+
+app.session(function(req, next) {
+    req.reply(403, 'sessions not implemented in this example');
+});
+
+app.use('/users', p2pMessenger(app));
 ```
 
-* It is nice:
-
-```javascript
-var nice = function(lala);
-```
-
-</section>
-
-
-## Application 2
-
-Application 2 is blablabla
+Here a very simple and functional instant messaging server is implemented.

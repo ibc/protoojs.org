@@ -8,7 +8,7 @@ $menu-item-height-mobile: 5.5rem;
 
 
 body {
-	background: shade($color-white-light, 8%);
+	background: shade($color-white-light, 6%);
 }
 
 
@@ -27,7 +27,7 @@ body {
 		color: $color-white-light;
 
 		span.double-o {
-			letter-spacing: -0.3rem;
+			letter-spacing: -0.25rem;
 		}
 
 		@media (min-width: 550px) {
@@ -49,16 +49,8 @@ body {
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
 .content {
-	padding: 3rem 0;
-
-	// Remove margin-top for first sibling elements.
-	h1 + h2, h1 + h3, h1 + p, h1 + ul, h1 + pre,
-	h2 + h3, h2 + h4, h2 + p, h2 + ul, h2 + pre,
-	h3 + h4, h3 + p, h3 + ul, h3 + pre,
-	h4 + p, h4 + ul, h4 + pre,
-	section + h3, section + h4, section + p, section + ul, section + pre {
-		margin-top: 0 !important;
-	}
+	padding-top: 3rem;
+	padding-bottom: 3rem;
 
 	h1 {
 		font-family: 'Poiret One';
@@ -101,16 +93,68 @@ body {
 		margin-bottom: 0.75rem;
 	}
 
+	ul {
+		line-height: 1.5rem;
+		color: $color-black-light;
+		margin-left: 2rem;
+		margin-top: 0.75rem;
+		margin-bottom: 0.75rem;
+		list-style-type: disc;
+
+		li ul {
+			margin-top: 0;
+			margin-bottom: 0;
+		}
+	}
+
+	a {
+		text-decoration: none;
+		color: $color-red-light;
+		font-weight: bold;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+
+	strong {
+		font-weight: bold;
+	}
+
+	em {
+		font-style: italic;
+	}
+
 	pre {
 		border: 1px solid #ddd;
-		margin-top: 0.75rem !important;
-		margin-bottom: 0.75rem !important;
-		margin-left: 0.5rem !important;
-		margin-right: 0.5rem !important;
+		margin-top: 1.5rem !important;
+		margin-bottom: 1.5rem !important;
+		margin-left: 0.6rem !important;
+		margin-right: 0.6rem !important;
+	}
+
+	:not(pre) > code {
+		font-family: Consolas, Monaco, 'Andale Mono', monospace;
+		font-size: 0.9rem;
+		color: $color-brown-light;
+		text-shadow: 0 1px white;
+		white-space: pre;
+		background-color: #fff;
+		padding: 0 4px;
 	}
 
 	section {
 		padding-left: 1.5rem;
 	}
 
+	// Remove margin-top for first sibling elements.
+	h1 + h2, h1 + h3, h1 + p, h1 + ul, h1 + pre,
+	h2 + h3, h2 + h4, h2 + p, h2 + ul, h2 + pre,
+	h3 + h4, h3 + p, h3 + ul, h3 + pre,
+	h4 + p, h4 + ul, h4 + pre,
+	ul + p,
+	p + ul,
+	section + h3, section + h4, section + p, section + ul, section + pre {
+		margin-top: 0 !important;
+	}
 }
