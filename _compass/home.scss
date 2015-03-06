@@ -24,7 +24,7 @@ body {
 .banner {
 	max-width: 750px;
 	width: 90%;
-	margin: 6rem auto 4rem;
+	margin: 6rem auto 5rem;
 
 	> h1 {
 		font-family: 'Poiret One';
@@ -45,10 +45,11 @@ body {
 		letter-spacing: -.1rem;
 		color: $color-white-dark;
 		margin: 0;
+		margin-bottom: 5rem;
 	}
 
 	> pre.install {
-		margin: 5rem auto;
+		margin: 0 auto;
 		width: 50%;
 		min-width: 300px;
 
@@ -72,7 +73,7 @@ body {
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
 .boxes {
-	margin-bottom: 4rem;
+	margin-bottom: 2rem;
 
 	.box {
 		margin-bottom: 2rem;
@@ -113,4 +114,14 @@ body {
 			}
 		}
 	}
+}
+
+
+/* Shields
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+.shields {
+	height: 20px;
+	text-align: center;
+	margin-bottom: 2rem;
 }

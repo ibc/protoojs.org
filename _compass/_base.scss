@@ -17,7 +17,11 @@ $color-brown-dark: #331b1b;
 $color-brown-light: #6d3134;
 
 // Other variables.
-$footer-height: 110px;
+$footer-num-items: 3;
+$footer-item-height: 2.5rem;
+$footer-padding: 1rem;
+$footer-height-horizontal: (2 * $footer-item-height) + ($footer-padding * 2);
+$footer-height-vertical: (($footer-num-items + 1) * $footer-item-height) + ($footer-padding * 2);
 
 
 html {
@@ -28,10 +32,17 @@ html {
 
 body {
 	height: 100%;
-	margin-bottom: $footer-height;
 	font-family: 'Open Sans';
 	font-size: 1em; /* currently ems cause chrome bug misinterpreting rems on body element */
 	font-weight: 400;
+
+	@media (min-width: 550px) {
+		margin-bottom: $footer-height-horizontal;
+	}
+
+	@media (max-width: 549px) {
+		margin-bottom: $footer-height-vertical;
+	}
 }
 
 
@@ -134,31 +145,23 @@ body {
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
 .footer {
-	$padding: 20px;
-	$line-height: ($footer-height - $padding * 2) / 2;
-
 	position: absolute;
 	bottom: 0;
 	width: 100%;
-	min-height: $footer-height;
 	@include box-sizing(border-box);
-	padding: $padding 0;
+	padding: $footer-padding 0;
 	background-color: $color-brown-dark; // Old browsers
 	@include background-image(linear-gradient(left, $color-brown-dark 0%,$color-brown-light 50%,$color-brown-dark 100%));
-
-	// Fix footer height in mobile.
-	@media (max-width: 549px) {
-		bottom: -3rem;
-	}
 
 	.grid {
 		max-width: 500px;
 	}
 
 	p {
+		height: $footer-item-height;
+		line-height: $footer-item-height;
 		color: $color-white-dark;
 		font-size: 0.9rem;
-		line-height: $line-height;
 		text-align: center;
 
 		a {

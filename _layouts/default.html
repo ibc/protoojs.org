@@ -18,6 +18,8 @@
 			<link rel='stylesheet' href='/css/default.css' media='screen, projection'>
 		{% endif %}
 
+		<script src='/js/fastclick.js'></script>
+
 		{% if page.has_code %}
 			<link rel='stylesheet' href='/css/prism.css'>
 			<script src='/js/prism.js'></script>
@@ -25,6 +27,11 @@
 	</head>
 
 	<body>
+		<script>
+			window.addEventListener('load', function() {
+				new FastClick(document.body);
+			}, false);
+		</script>
 
 		{% if page.is_home != true %}
 			<div class='protoo-title-bar'>
