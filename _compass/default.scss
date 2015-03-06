@@ -8,7 +8,7 @@ $menu-item-height-mobile: 5.5rem;
 
 
 body {
-	background: shade($color-white-light, 6%);
+	background: shade($color-white-light, 2%);
 }
 
 
@@ -140,7 +140,8 @@ body {
 		text-shadow: 0 1px white;
 		white-space: pre;
 		background-color: #fff;
-		padding: 0 4px;
+		border: 1px solid #eee;
+		padding: 1px 2px;
 	}
 
 	section {
