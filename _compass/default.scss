@@ -1,10 +1,10 @@
-// Value for some variables used in _base.scss.
+// Include main style.
+@import 'main';
+
+// Internal variables.
 $menu-num-items: 4;
 $menu-item-height: 3.5rem;
 $menu-item-height-mobile: 5.5rem;
-
-// Use base style.
-@import 'base';
 
 
 body {
@@ -12,34 +12,142 @@ body {
 }
 
 
-/* Title
+/* Top bar
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
-.protoo-title-bar {
+.top-bar {
+	z-index: 10;
 	width: 100%;
 	background: shade($color-red-light, 25%);
 
-	h1 {
-		max-width: 750px;
+	@include breakpoint($media-big) {
+		position: fixed;
+	}
+
+	@include breakpoint($media-small) {
+		position: absolute;
+		height: $menu-item-height-mobile;
+		overflow: hidden;
+		@include transition-duration(0.25s);
+
+		&.visible {
+			height: $menu-item-height-mobile * ($menu-num-items + 1);
+		}
+	}
+
+	.wrapper {
+		max-width: 1024px;
 		width: 90%;
 		margin: 0 auto;
-		font-family: 'Poiret One';
-		color: $color-white-light;
 
-		span.double-o {
-			letter-spacing: -0.25rem;
+		@include breakpoint($media-big) {
+			@include display-flex;
 		}
 
-		@media (min-width: 550px) {
-			font-size: $menu-item-height / 1.4;
-			height: $menu-item-height;
-			line-height: $menu-item-height * 0.77;
+		h1 {
+			@include flex-grow(10);
+			font-family: 'Poiret One';
+			color: $color-white-light;
+
+			@include breakpoint($media-big) {
+				font-size: $menu-item-height / 1.4;
+				line-height: $menu-item-height * 0.75;
+
+				span.double-o {
+					letter-spacing: -0.25rem;
+				}
+			}
+
+			@include breakpoint($media-small) {
+				font-size: $menu-item-height-mobile / 1.4;
+				height: $menu-item-height-mobile;
+				line-height: $menu-item-height-mobile * 0.85;
+
+				span.double-o {
+					letter-spacing: -0.4rem;
+				}
+
+				span.menu-icon {
+					float: right;
+					height: 100%;
+					width: $menu-item-height-mobile;
+					line-height: $menu-item-height-mobile;
+					background: center right url(/images/menu.png) no-repeat;
+					background-size: $menu-item-height-mobile / 2;
+					cursor: pointer;
+				}
+			}
 		}
 
-		@media (max-width: 549px) {
-			font-size: $menu-item-height-mobile / 1.4;
-			height: $menu-item-height-mobile;
-			line-height: $menu-item-height-mobile * 0.77;
+		.item {
+			@include flex-grow(1);
+			position: relative;
+
+			> a {
+				@include box-sizing(border-box);
+				@include transition-duration(0.25s);
+				display: block;
+				text-align: center;
+				text-decoration: none;
+				color: $color-white-dark;
+
+				@include breakpoint($media-big) {
+					line-height: $menu-item-height;
+					font-size: 1rem;
+
+					&:hover {
+						color: $color-white-light;
+					}
+				}
+
+				@include breakpoint($media-small) {
+					line-height: $menu-item-height-mobile;
+					font-size: 1.1rem;
+
+					&:hover {
+						color: $color-white-light;
+						border-color: $color-white-light;
+					}
+				}
+			}
+
+			@include breakpoint($media-big) {
+				&:hover .submenu {
+					display: block;
+				}
+			}
+
+			.submenu {
+				z-index: 20;
+				position: absolute;
+				top: $menu-item-height / 1.25;
+				width: 100%;
+				background: tint($color-brown-light, 85%);
+				border: 1px solid tint($color-black-light, 25%);
+				border-radius: 5px;
+				padding: 0.4rem;
+				@include transition-duration(0.25s);
+				@include box-shadow(0px 2px 5px 0px rgba(#666,0.2));
+				display: none;
+
+				> a {
+					display: block;
+					text-decoration: none;
+					color: $color-black-light;
+					font-size: 1rem;
+					padding: 0 0.5rem;
+					@include transition-duration(0.1s);
+
+					@include breakpoint($media-big) {
+						line-height: $menu-item-height / 2;
+					}
+
+					&:hover {
+						background-color: $color-red-light;
+						color: $color-white-light;
+					}
+				}
+			}
 		}
 	}
 }
@@ -49,8 +157,18 @@ body {
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
 .content {
-	padding-top: 3rem;
 	padding-bottom: 3rem;
+	width: 90%;
+	max-width: 1024px;
+	margin: 0 auto;
+
+	@include breakpoint($media-big) {
+		padding-top: $menu-item-height + 3rem;
+	}
+
+	@include breakpoint($media-small) {
+		padding-top: $menu-item-height-mobile + 3rem;
+	}
 
 	h1 {
 		font-family: 'Poiret One';
@@ -131,6 +249,10 @@ body {
 		margin-bottom: 1.5rem !important;
 		margin-left: 0.6rem !important;
 		margin-right: 0.6rem !important;
+
+		code {
+			// font-size: 0.9rem !important;
+		}
 	}
 
 	:not(pre) > code {
@@ -140,7 +262,7 @@ body {
 		text-shadow: 0 1px white;
 		white-space: pre;
 		background-color: #fff;
-		border: 1px solid #eee;
+		border: 1px solid #ddd;
 		padding: 1px 2px;
 	}
 

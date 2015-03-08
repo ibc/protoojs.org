@@ -21,11 +21,13 @@ kramdown:
 
 gems:
   - jekyll-compass
+  - singularitygs
+  - breakpoint
 
 defaults:
   -
     scope:
       path: ''
     values:
-      layout: default
+      layout: layout
 

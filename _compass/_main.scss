@@ -1,0 +1,104 @@
+@import 'compass/reset';
+@import 'compass/css3/box-sizing';
+@import 'compass/css3/images';
+@import 'compass/css3/transition';
+@import 'compass/css3/box-shadow';
+@import 'compass/css3/flexbox';
+@import 'compass/utilities/general/clearfix';
+@import 'memo';  // Must be before 'breakpoint'.
+@import 'singularitygs';
+@import 'breakpoint';
+
+// Exported variables.
+$media-big:   min-width 600px;
+$media-small: max-width 600px;
+$color-white-light: #fff;
+$color-white-dark: #fdeae8;
+$color-black-light: #555;
+$color-black-dark: #333;
+$color-red-light: #B74244;
+$color-red-dark: #602F2F;
+$color-brown-dark: #331b1b;
+$color-brown-light: #6d3134;
+
+// Internal variables.
+$footer-num-items: 3;
+$footer-item-height: 2.5rem;
+$footer-padding: 1rem;
+$footer-height-horizontal: (2 * $footer-item-height) + ($footer-padding * 2);
+$footer-height-vertical: (($footer-num-items + 1) * $footer-item-height) + ($footer-padding * 2);
+
+
+html {
+	position: relative;
+	min-height: 100%;
+	font-size: 90%;
+}
+
+
+body {
+	height: 100%;
+	font-family: 'Open Sans';
+	font-size: 1em; /* currently ems cause chrome bug misinterpreting rems on body element */
+	font-weight: 400;
+
+	@include breakpoint($media-big) {
+		margin-bottom: $footer-height-horizontal;
+	}
+
+	@include breakpoint($media-small) {
+		margin-bottom: $footer-height-vertical;
+	}
+}
+
+
+/* Footer
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+.footer {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	padding: $footer-padding 0;
+	background-color: $color-brown-dark; // Old browsers
+	@include background-image(linear-gradient(left, $color-brown-dark 0%,$color-brown-light 50%,$color-brown-dark 100%));
+
+	.links {
+		@include add-grid(3);
+		@include add-gutter(1/4);
+		@include pie-clearfix;
+		max-width: 500px;
+		margin: 0 auto;
+
+		a {
+			display: block;
+			height: $footer-item-height;
+			line-height: $footer-item-height;
+			color: $color-white-dark;
+			font-size: 0.9rem;
+			text-align: center;
+			text-decoration: none;
+			border-bottom: 1px solid $color-brown-dark;
+			@include box-sizing(border-box);
+			@include transition-duration(0.25s);
+
+			&:hover {
+				border-color: $color-red-light;
+			}
+
+			@include breakpoint($media-big) {
+				&.col1 { @include grid-span(1,1); }
+				&.col2 { @include grid-span(1,2); }
+				&.col3 { @include grid-span(1,3); }
+			}
+		}
+	}
+
+	p.copyright {
+		height: $footer-item-height;
+		line-height: $footer-item-height;
+		text-align: center;
+		font-size: 0.8rem;
+		color: #c57e75;
+	}
+}

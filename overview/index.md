@@ -1,5 +1,5 @@
 ---
-title: protoo - Overview
+title: Overview
 has_code: true
 ---
 
