@@ -5,7 +5,7 @@
 $max-width: 750px;
 $menu-num-items: 4;
 $menu-item-height: 5.5rem;
-$menu-item-height-mobile: 5.5rem;
+$menu-item-height-mobile: 4.5rem;
 
 
 body {
@@ -176,14 +176,18 @@ body {
 	@include add-grid(3);
 	@include add-gutter(1/4);
 	@include pie-clearfix;
-	max-width: 1024px;
-	padding: 0 4rem;
+	max-width: $page-max-width;
+	width: 90%;
 	margin: 0 auto 2rem auto;
 
 	.box {
-		&.col1 { @include grid-span(1,1); }
-		&.col2 { @include grid-span(1,2); }
-		&.col3 { @include grid-span(1,3); }
+		margin-bottom: 4rem;
+
+		@include breakpoint($media-big) {
+			&.col1 { @include grid-span(1,1); }
+			&.col2 { @include grid-span(1,2); }
+			&.col3 { @include grid-span(1,3); }
+		}
 
 		h3 {
 			font-size: 1.4rem;
@@ -194,8 +198,12 @@ body {
 			border-bottom: 1px solid $color-brown-light;
 			margin-bottom: 1.5rem;
 
-			@include breakpoint($media-small) {
+			@include breakpoint(max-width 800px) {
 				font-size: 1.1rem;
+			}
+
+			@include breakpoint($media-small) {
+				font-size: 1.4rem;
 			}
 		}
 

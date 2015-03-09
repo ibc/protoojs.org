@@ -4,7 +4,7 @@
 // Internal variables.
 $menu-num-items: 4;
 $menu-item-height: 3.5rem;
-$menu-item-height-mobile: 5.5rem;
+$menu-item-height-mobile: 4.5rem;
 
 
 body {
@@ -36,7 +36,7 @@ body {
 	}
 
 	.wrapper {
-		max-width: 1024px;
+		max-width: $page-max-width;
 		width: 90%;
 		margin: 0 auto;
 
@@ -64,7 +64,7 @@ body {
 				line-height: $menu-item-height-mobile * 0.85;
 
 				span.double-o {
-					letter-spacing: -0.4rem;
+					letter-spacing: -0.33rem;
 				}
 
 				span.menu-icon {
@@ -121,6 +121,7 @@ body {
 				z-index: 20;
 				position: absolute;
 				top: $menu-item-height / 1.25;
+				@include box-sizing(border-box);
 				width: 100%;
 				background: tint($color-brown-light, 85%);
 				border: 1px solid tint($color-black-light, 25%);
@@ -157,17 +158,36 @@ body {
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
 .content {
-	padding-bottom: 3rem;
+	padding-bottom: 6rem;
 	width: 90%;
-	max-width: 1024px;
+	max-width: $page-max-width;
 	margin: 0 auto;
+	color: $color-black-light;
 
 	@include breakpoint($media-big) {
 		padding-top: $menu-item-height + 3rem;
+
+		// Fix fixed header size for anchor links.
+		h2:before, h3:before, h4:before {
+			content: '';
+			display: block;
+			height: $menu-item-height;
+			margin-top: -$menu-item-height;
+			visibility: hidden;
+		}
 	}
 
 	@include breakpoint($media-small) {
 		padding-top: $menu-item-height-mobile + 3rem;
+
+		// Fix fixed header size for anchor links.
+		h2:before, h3:before, h4:before {
+			content: '';
+			display: block;
+			height: $menu-item-height-mobile;
+			margin-top: -$menu-item-height-mobile;
+			visibility: hidden;
+		}
 	}
 
 	h1 {
@@ -178,42 +198,62 @@ body {
 	}
 
 	h2 {
-		font-size: 2rem;
-		line-height: 3rem;
+		font-size: 2.1rem;
+		line-height: 3.5rem;
 		color: $color-black-dark;
 		font-weight: bold;
 		border-bottom: 1px solid $color-red-light;
-		margin-top: 3rem;
+		margin-top: 3.5rem;
 		margin-bottom: 2.5rem;
+
+		&.code {
+			font-family: Consolas, Monaco, 'Andale Mono', monospace;
+			font-size: 1.75rem;
+		}
 	}
 
 	h3 {
-		font-size: 1.75rem;
+		font-size: 1.6rem;
 		line-height: 2.5rem;
-		color: tint($color-black-light, 15%);
+		color: tint($color-black-light, 25%);
 		font-weight: bold;
 		margin-top: 2.5rem;
-		margin-bottom: 1.75rem;
+		margin-bottom: 2rem;
+
+		&.code {
+			font-family: Consolas, Monaco, 'Andale Mono', monospace;
+			font-size: 1.5rem;
+		}
 	}
 
 	h4 {
-		font-size: 1.3rem;
+		font-size: 1.2rem;
 		color: $color-black-dark;
 		font-weight: bold;
-		margin-top: 1.75rem;
+		margin-top: 2.75rem;
 		margin-bottom: 1.5rem;
+
+		&.code {
+			font-family: Consolas, Monaco, 'Andale Mono', monospace;
+		}
+	}
+
+	h5 {
+		font-size: 1.1rem;
+		color: tint($color-black-light, 25%);
+		font-weight: bold;
+		margin-top: 1.5rem;
+		margin-bottom: 1rem;
 	}
 
 	p {
 		line-height: 1.5rem;
-		color: $color-black-light;
 		margin-top: 0.75rem;
 		margin-bottom: 0.75rem;
 	}
 
 	ul {
 		line-height: 1.5rem;
-		color: $color-black-light;
 		margin-left: 2rem;
 		margin-top: 0.75rem;
 		margin-bottom: 0.75rem;
@@ -247,8 +287,11 @@ body {
 		border: 1px solid #ddd;
 		margin-top: 1.5rem !important;
 		margin-bottom: 1.5rem !important;
-		margin-left: 0.6rem !important;
-		margin-right: 0.6rem !important;
+
+		// Force white background.
+		&, * {
+			background-color: #fff !important;
+		}
 
 		code {
 			// font-size: 0.9rem !important;
@@ -259,25 +302,112 @@ body {
 		font-family: Consolas, Monaco, 'Andale Mono', monospace;
 		font-size: 0.9rem;
 		color: $color-brown-light;
-		text-shadow: 0 1px white;
-		white-space: pre;
-		background-color: #fff;
-		border: 1px solid #ddd;
+		// white-space: pre;
+		background-color: #fff !important;
+		border: 1px solid #ddd !important;
 		padding: 1px 2px;
 	}
 
 	section {
+		margin: 0;
 		padding-left: 1.5rem;
+
+		> h4 {
+			margin-left: -0.5rem;
+		}
+	}
+
+	div.note {
+		$color: #74ccd3;
+
+		margin: 2rem 2rem;
+		padding: 1rem;
+		font-size: 0.9rem;
+		background: tint($color, 75%);
+		border: 1px solid shade($color, 0%);
+		border-radius: 5px;
+
+		> *:first-child {
+			margin-top: 0 !important;
+		}
+
+		> *:last-child {
+			margin-bottom: 0 !important;
+		}
+
+		> pre {
+			margin: 0 !important;
+			padding: 0 1rem !important;
+
+			&, * {
+				border: none !important;
+				background-color: inherit !important;
+				color: inherit !important;
+			}
+		}
+
+		code {
+			border: none !important;
+			background-color: inherit !important;
+			color: inherit !important;
+		}
+	}
+
+	table {
+		width: 100%;
+		margin: 0 auto;
+		border-collapse:collapse;
+		margin-top: 1.5rem;
+		margin-bottom: 1.5rem;
+
+		th {
+			padding: 0.5rem;
+			font-size: 1rem;
+			font-weight: bold;
+			text-align: center;
+			background-color: #eee;
+		}
+
+		td {
+			padding: 0.25rem 0.5rem;
+			font-size: 0.9rem;
+			line-height: 2rem;
+		}
+
+		th, td {
+			border: 1px solid #ddd;
+		}
 	}
 
 	// Remove margin-top for first sibling elements.
 	h1 + h2, h1 + h3, h1 + p, h1 + ul, h1 + pre,
 	h2 + h3, h2 + h4, h2 + p, h2 + ul, h2 + pre,
 	h3 + h4, h3 + p, h3 + ul, h3 + pre,
-	h4 + p, h4 + ul, h4 + pre,
+	h4 + h5, h4 + p, h4 + ul, h4 + pre,
 	ul + p,
 	p + ul,
-	section + h3, section + h4, section + p, section + ul, section + pre {
+	section > *:first-child {
 		margin-top: 0 !important;
 	}
+	section > *:last-child {
+		margin-bottom: 0 !important;
+	}
 }
+
+
+/* Nav menu
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+// nav.scroll-nav {
+// 	position: fixed;
+// 	z-index: 2000;
+// 	top: 50px;
+// 	right: 0;
+// 	border: 1px solid red;
+
+// 	li.scroll-nav__item {
+// 		&.active {
+// 			font-weight: bold;
+// 		}
+// 	}
+// }

@@ -3,6 +3,7 @@ title: Overview
 has_code: true
 ---
 
+
 # Overview
 
 Protoo is a [Node.js](http://nodejs.org/) signaling framework that makes easy building Real-Time Communication applications. Its primary purpose is to provide existing Web applications with chat, presence and audio&video calling capabilities, although those are just few of many functionalities that Protoo can provide.
@@ -46,7 +47,9 @@ app.use(function logger(req, next) {
 
 // messenger middleware handles 'message' requests.
 // It is mounted on /users path.
-app.use('/users', messenger(app));
+app.use('/users', messenger(app, {
+    path: '/:username/:uuid?'
+}));
 
 // No 'session' support.
 app.session(function no_session_support(req, next) {

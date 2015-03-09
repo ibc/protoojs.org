@@ -10,6 +10,7 @@
 @import 'breakpoint';
 
 // Exported variables.
+$page-max-width: 1024px;
 $media-big:   min-width 600px;
 $media-small: max-width 600px;
 $color-white-light: #fff;
