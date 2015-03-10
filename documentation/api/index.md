@@ -1,14 +1,24 @@
 ---
 title: API
-has_code: true
-has_toc: true
+code: true
+toc: true
 ---
+
+
+<div markdown='1' class='toc-wrapper hidden'>
+* Will be replaced with the ToC
+{: toc .toc}
+</div>
+
+<div markdown='1' class='toc-button'>
+</div>
 
 
 # API
 
 
 ## protoo
+{: #protoo}
 
 The top-level **protoo** module.
 
@@ -18,12 +28,13 @@ var protoo = require('protoo');
 
 
 ### Properties
+{: #protoo-properties}
 
 <section markdown='1'>
 
 
 #### protoo.version
-{: .code}
+{: #protoo-version .code}
 
 A string indicating the version of the **protoo** module.
 
@@ -34,7 +45,7 @@ protoo.version;
 
 
 #### protoo.middleware
-{: .code}
+{: #protoo-middleware .code}
 
 An object with the Protoo's built-in middlewares:
 
@@ -56,12 +67,13 @@ For more information check the [Middleware](/documentation/middleware/) section.
 
 
 ### Methods
+{: #protoo-methods}
 
 <section markdown='1'>
 
 
 #### protoo()
-{: .code}
+{: #protoo-function .code}
 
 The top level function exported by the **protoo** module. It creates a Protoo `Application`.
 
@@ -75,6 +87,7 @@ var app = protoo();
 
 
 ## Application
+{: #app}
 
 The Protoo application, typically named `app`. Created by calling the top-level **protoo** module function.
 
@@ -92,11 +105,14 @@ The application inherits from the Node [EventEmitter](https://nodejs.org/api/eve
 
 
 ### Configuration Methods
+{: #app-configuration-methods}
 
 <section markdown='1'>
 
 
 The table below lists available application settings.
+
+<div markdown='1' class='table-wrapper'>
 
 Setting Name             | Type    | Value         | Default
 ------------------------ | ------- | ------------- | -------------
@@ -104,9 +120,11 @@ Setting Name             | Type    | Value         | Default
 `case sensitive routing` | Boolean | Enable case sensitivity. | Disabled. Treats "/Users" and "/users" as the same.
 `strict routing`         | Boolean | Enable strict routing. | Disabled. Treats "/users/" and "/users" as the same.
 
+</div>
+
 
 #### app.set(name, value)
-{: .code}
+{: #app-set .code}
 
 Configuration setter. Assigns the setting `name` to `value`.
 
@@ -116,7 +134,7 @@ app.set('env', 'development');
 
 
 #### app.get(name)
-{: .code}
+{: #app-get .code}
 
 Configuration getter. Gets the value of setting `name`.
 
@@ -127,7 +145,7 @@ app.get('env');
 
 
 #### app.enable(name)
-{: .code}
+{: #app-enable .code}
 
 Sets the Boolean setting `name` to `true`. Has the same effect as calling `set(name, true)`.
 
@@ -137,7 +155,7 @@ app.enable('strict routing');
 
 
 #### app.disable(name)
-{: .code}
+{: #app-disable .code}
 
 Sets the Boolean setting `name` to `false`. Has the same effect as calling `set(name, false)`.
 
@@ -147,7 +165,7 @@ app.disable('case sensitive routing');
 
 
 #### app.enabled(name)
-{: .code}
+{: #app-enabled .code}
 
 Returns `true` if the setting `name` is enabled (`true`).
 
@@ -158,7 +176,7 @@ app.enabled('strict routing');
 
 
 #### app.disabled(name)
-{: .code}
+{: #app-disabled .code}
 
 Returns `true` if the setting `name` is disabled (`false`).
 
@@ -172,12 +190,13 @@ app.disabled('case sensitive routing');
 
 
 ### Transport Methods
+{: #app-transport-methods}
 
 <section markdown='1'>
 
 
 #### app.websocket(httpServer, requestListener)
-{: .code}
+{: #app-websocket .code}
 
 Adds a WebSocket server to the application.
 
@@ -242,8 +261,8 @@ app.websocket(httpServer, function(info, accept, reject) {
 ```
 
 
-#### app.close(closeServers)
-{: .code}
+#### app.close([closeServers])
+{: #app-close .code}
 
 Closes the application and disconnect existing peers.
 
@@ -254,12 +273,13 @@ If `closeServers` is set to `true` then underlying servers (such as the HTTP ser
 
 
 ### Routing Methods
+{: #app-routing-methods}
 
 <section markdown='1'>
 
 
 #### app.use([mountPath,] function [, function...])
-{: .code}
+{: #app-use .code}
 
 Mounts the middleware `function`(s) at the `mountPath`. If `mountPath` is not specified it defaults to "/".
 
@@ -317,10 +337,35 @@ app.use(['/abcd', '/xyza', /\/lmn|\/pqr/], function(req, next) {
 ```
 
 
+#### app.all(path, function [, function ...])
+{: #app-all .code}
+
+TODO
+
+
+#### app.METHOD(path, function [, function ...])
+{: #app-METHOD .code}
+
+TODO
+
+
+#### app.param(name, function)
+{: #app-param .code}
+
+TODO
+
+
+#### app.route(path)
+{: #app-route .code}
+
+TODO
+
+
 </section>
 
 
 ### Events
+{: #app-events}
 
 <section markdown='1'>
     
@@ -329,7 +374,7 @@ The application inherits from the Node [EventEmitter](https://nodejs.org/api/eve
 
 
 #### app.on('online', callback(peer))
-{: .code}
+{: #app-on-online .code}
 
 Emitted when a peer connects to Protoo. The `Peer` instance is given as callback parameter.
 
@@ -341,7 +386,7 @@ app.on('online', function(peer) {
 
 
 #### app.on('offline', callback(peer))
-{: .code}
+{: #app-on-offline .code}
 
 Emitted when a peer is disconnected. The `Peer` instance is given as callback parameter.
 
@@ -353,7 +398,7 @@ app.on('offline', function(peer) {
 
 
 #### app.on('error:route', callback(error))
-{: .code}
+{: #app-on-error-route .code}
 
 Emitted when an error throws in runtime while routing/dispatching a request. The `Error` instance is given as callback parameter.
 

@@ -6,6 +6,8 @@ markdown: kramdown
 
 kramdown:
   input: GFM
+  auto_ids: false
+  toc_levels: 2..4
 
 gems:
   - jekyll-compass
