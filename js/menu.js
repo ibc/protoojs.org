@@ -10,6 +10,7 @@ window.addEventListener('load', function() {
 		if (! topBar.classList.contains('visible')) {
 			topBar.classList.add('visible');
 			event.stopPropagation();
+			event.preventDefault();
 		} else {
 			topBar.classList.remove('visible');
 		}

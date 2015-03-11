@@ -361,6 +361,18 @@ TODO
 TODO
 
 
+#### app.Router([options])
+{: #app-Router .code}
+
+TODO
+
+
+#### app.peers(username, [uuid,] function)
+{: #app-peers .code}
+
+TODO
+
+
 </section>
 
 

@@ -9,7 +9,6 @@ $menu-item-height-mobile: 4.5rem;
 
 body {
 	background: shade($color-white-light, 2%);
-	overflow: hidden;
 }
 
 
@@ -377,6 +376,13 @@ body {
 		}
 	}
 
+	.big {
+		ul {
+			line-height: 3rem;
+			font-size: 1.5rem;
+		}
+	}
+
 	// Remove margin-top for first sibling elements.
 	h1 + h2, h1 + h3, h1 + p, h1 + ul, h1 + pre,
 	h2 + h3, h2 + h4, h2 + p, h2 + ul, h2 + pre,
@@ -400,9 +406,10 @@ body {
 	position: fixed;
 	z-index: 10;
 	left: 101%;  // Hidden
-	// top: $menu-item-height;
 	bottom: 0;
 	width: 100%;
+	max-height: 70%;
+	overflow: auto;
 	background: rgba($color-brown-dark, 0.95);
 	@include transition-duration(0.2s);
 
@@ -453,7 +460,7 @@ body {
 					line-height: 1.5rem;
 					color: tint($color-red-light, 25%);
 
-					// Thrid level (API).
+					// Third level (API).
 					> ul {
 						margin-left: 0.5rem;
 

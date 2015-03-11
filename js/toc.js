@@ -19,4 +19,13 @@ window.addEventListener('load', function() {
 		}
 	}, false);
 
+	toc.addEventListener('mouseover', function(event) {
+		// NOTE: This does not work in Chrome.
+		document.body.style.overflow = 'hidden';
+	}, false);
+
+	toc.addEventListener('mouseout', function(event) {
+		document.body.style.overflow = 'auto';
+	}, false);
+
 }, false);

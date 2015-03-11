@@ -5,5 +5,9 @@ title: Documentation
 
 # Documentation
 
+<div markdown='1' class='big'>
+
 * [Overview](/overview/)
-* [API reference](/documentation/api/)
+* [API](/documentation/api/)
+
+</div>
