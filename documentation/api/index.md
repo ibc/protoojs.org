@@ -75,7 +75,7 @@ For more information check the [Middleware](/documentation/middleware/) section.
 #### protoo()
 {: #protoo-function .code}
 
-The top level function exported by the **protoo** module. It creates a Protoo `Application`.
+The top level function exported by the **protoo** module. It creates a Protoo [Application](#app).
 
 ```javascript
 var protoo = require('protoo');
@@ -89,7 +89,7 @@ var app = protoo();
 ## Application
 {: #app}
 
-The Protoo application, typically named `app`. Created by calling the top-level **protoo** module function.
+The Protoo application, typically named `app`. Created by calling the top-level [protoo()](#protoo-function) function.
 
 ```javascript
 var app = protoo();
@@ -100,8 +100,6 @@ The application instance provides methods for:
 * Configuring the application via settings.
 * Building the request routing logic by adding middlewares.
 * Adding network transports.
-
-The application inherits from the Node [EventEmitter](https://nodejs.org/api/events.html#events_class_events_eventemitter) class.
 
 
 ### Configuration Methods
@@ -289,7 +287,7 @@ Mounting a middleware at a path will cause the middleware function to be execute
 A route will match any mount path which follows its path immediately with a "/". For example: `app.use('/services', ...)` will match **/services**, **/services/multiconference** and so on.
 </div>
 
-`mountPath` can be a string representing a path, a path pattern, a regular expression to match paths, or an array of combinations thereof:
+`mountPath` can be a string representing a path, a path pattern, a regular expression to match paths, or an array of combinations thereof.
 
 
 ##### Path
@@ -337,40 +335,148 @@ app.use(['/abcd', '/xyza', /\/lmn|\/pqr/], function(req, next) {
 ```
 
 
-#### app.all(path, function [, function ...])
-{: #app-all .code}
-
-TODO
-
-
 #### app.METHOD(path, function [, function ...])
 {: #app-METHOD .code}
 
-TODO
+Routes a Protoo request where METHOD is the Protoo method of the request, such as "message", "session", and so on. The middleware function(s) are invoked just if the path of the request matches the given `path`.
+
+You can provide multiple callback functions that behave just like middleware, except that these callbacks can invoke `next('route')` to bypass the remaining route callback(s). You can use this mechanism to impose pre-conditions on a route, then pass control to subsequent routes if there is no reason to proceed with the current route.
+
+```javascript
+app.message('/users/:username/:uuid?', function(req, next) {
+    console.log('processing message [path:%s]', req.path);
+
+    // Invoke next() to pass the control to next middleware.
+    next();
+});
+```
+
+
+#### app.all(path, function [, function ...])
+{: #app-all .code}
+
+This method is like the standard [app.METHOD()](#app-METHOD) methods, except it matches all Protoo methods.
+
+It’s useful for mapping "global" logic for specific path prefixes or arbitrary matches regardless which method the request has.
+
+```javascript
+app.all('*', function(req, next) {
+    console.log('processing request [method:%s, path:%s]', req.method, req.path);
+
+    // Invoke next() to pass the control to next middleware.
+    next();
+});
+```
 
 
 #### app.param(name, function)
 {: #app-param .code}
 
-TODO
+Add callback triggers to route parameters, where `name` is the name of the parameter or an array of them, and `function` is the callback function. The parameters of the callback function are the request object, the next middleware, and the value of the parameter, in that order.
+
+For example, when `:user` is present in a route path, you may map user loading logic to automatically store `user` into the request and make it accesible in the whole route, or perform validations on the parameter input.
+
+```javascript
+app.param('user', function(req, next, userId) {
+    // Get the user details from the User model and attach it to the request object.
+    User.find(userId, function(err, user) {
+        if (user) {
+            // User found, store it into the request.
+            req.set('user', user);
+            // Call next() to pass the control to next middleware.
+            next();
+        }
+        if (err) {
+            // Error. Call next() with the error.
+            next(err);
+        }
+        else {
+            // User not found. Generate an error and call next() with it.
+            next(new Error('user not found'));
+        }
+    });
+});
+```
+
+Param callback functions are local to the router on which they are defined. They are not inherited by mounted routers. Hence, param callbacks defined on `app` will be triggered only by route parameters defined on `app` routes.
+
+A param callback will be called only once in a request-response cycle, even if the parameter is matched in multiple routes, as shown in the following example.
+
+```javascript
+app.param('username', function (req, next, username) {
+    console.log('CALLED ONLY ONCE');
+    next();
+})
+
+app.message('/user/:username', function (req, next) {
+    console.log('although this matches');
+    next();
+});
+
+app.messaget('/user/:username', function (req, next) {
+    console.log('and this matches too');
+    next();
+});
+```
 
 
 #### app.route(path)
 {: #app-route .code}
 
-TODO
+Returns an instance of a single route, which you can then use to handle Protoo requests with optional middleware. Use `app.route()` to avoid duplicate route names (and thus typo errors).
+
+```javascript
+app.route('/users/:username/:uuid?')
+    .all(function(req, next) {
+        // Runs for all Protoo requests first.
+        next();
+    })
+    .message(function(req, next) {
+        // Just runs for 'message' requests.
+        req.reply(404, 'not found');
+    })
+    .session(function(req, next) {
+        // Just runs for 'session' requests.
+        req.reply(404, 'not found');
+    });
+```
 
 
 #### app.Router([options])
 {: #app-Router .code}
 
-TODO
+Creates a router that inherits settings from the `app`. Check the [Router](#router) documentation for detailed information.
 
 
 #### app.peers(username, [uuid,] function)
 {: #app-peers .code}
 
-TODO
+Returns the number of online peers matching the given `username` and (optional) `uuid`, and run the given handler `function` for all of them.
+
+The given `function` is called with each retrieved [Peer](#peer) instance as argument.
+
+<div markdown='1' class='note'>
+This method is useful for middleware developers that want to forward or send requests to online peers.
+</div>
+
+```javascript
+app.route('/users/:username/:uuid?')
+    .message(function(req, next) {
+        var found;
+
+        found = app.peers(req.params.username, req.params.uuid, function(peer) {
+            console.log('sending message request to %s', peer);
+            peer.send(req);
+        });
+
+        if (found) {
+            req.reply(200, 'message sent to ' + found + ' peers');
+        }
+        else {
+            req.reply(404, 'peer not found');
+        }
+    });
+```
 
 
 </section>
@@ -388,7 +494,7 @@ The application inherits from the Node [EventEmitter](https://nodejs.org/api/eve
 #### app.on('online', callback(peer))
 {: #app-on-online .code}
 
-Emitted when a peer connects to Protoo. The `Peer` instance is given as callback parameter.
+Emitted when a peer connects to Protoo. The [Peer](#peer) instance is given as callback parameter.
 
 ```javascript
 app.on('online', function(peer) {
@@ -400,7 +506,7 @@ app.on('online', function(peer) {
 #### app.on('offline', callback(peer))
 {: #app-on-offline .code}
 
-Emitted when a peer is disconnected. The `Peer` instance is given as callback parameter.
+Emitted when a peer is disconnected. The [Peer](#peer) instance is given as callback parameter.
 
 ```javascript
 app.on('offline', function(peer) {
