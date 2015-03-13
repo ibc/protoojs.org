@@ -117,6 +117,7 @@ Setting Name             | Type    | Value         | Default
 `env`                    | String  | Environment mode. | `NODE_ENV` environment variable or "development".
 `case sensitive routing` | Boolean | Enable case sensitivity. | Disabled. Treats "/Users" and "/users" as the same.
 `strict routing`         | Boolean | Enable strict routing. | Disabled. Treats "/users/" and "/users" as the same.
+`disconnection grace period` | Number | Milliseconds to wait for a peer to reconnect before emitting 'offline'. Useful for website reload in the browser. | 0 (disabled).
 
 </div>
 
@@ -276,7 +277,10 @@ If `closeServers` is set to `true` then underlying servers (such as the HTTP ser
 <section markdown='1'>
 
 
-#### app.use([mountPath,] function [, function...])
+For a better understanding of how routing works check the [Routing](/documentation/routing/) documentation.
+
+
+#### app.use([mountPath], [function, ...] function)
 {: #app-use .code}
 
 Mounts the middleware `function`(s) at the `mountPath`. If `mountPath` is not specified it defaults to "/".
@@ -335,7 +339,7 @@ app.use(['/abcd', '/xyza', /\/lmn|\/pqr/], function(req, next) {
 ```
 
 
-#### app.METHOD(path, function [, function ...])
+#### app.METHOD(path, [function, ...] function)
 {: #app-METHOD .code}
 
 Routes a Protoo request where METHOD is the Protoo method of the request, such as "message", "session", and so on. The middleware function(s) are invoked just if the path of the request matches the given `path`.
@@ -352,7 +356,7 @@ app.message('/users/:username/:uuid?', function(req, next) {
 ```
 
 
-#### app.all(path, function [, function ...])
+#### app.all(path, [function, ...] function)
 {: #app-all .code}
 
 This method is like the standard [app.METHOD()](#app-METHOD) methods, except it matches all Protoo methods.
@@ -372,7 +376,7 @@ app.all('*', function(req, next) {
 #### app.param(name, function)
 {: #app-param .code}
 
-Add callback triggers to route parameters, where `name` is the name of the parameter or an array of them, and `function` is the callback function. The parameters of the callback function are the request object, the next middleware, and the value of the parameter, in that order.
+Adds callback triggers to route parameters, where `name` is the name of the parameter or an array of them, and `function` is the callback function. The parameters of the callback function are the request object, the next middleware, and the value of the parameter, in that order.
 
 For example, when `:user` is present in a route path, you may map user loading logic to automatically store `user` into the request and make it accesible in the whole route, or perform validations on the parameter input.
 
@@ -448,12 +452,12 @@ app.route('/users/:username/:uuid?')
 Creates a router that inherits settings from the `app`. Check the [Router](#router) documentation for detailed information.
 
 
-#### app.peers(username, [uuid,] function)
+#### app.peers(username, [[uuid], function])
 {: #app-peers .code}
 
 Returns the number of online peers matching the given `username` and (optional) `uuid`, and run the given handler `function` for all of them.
 
-The given `function` is called with each retrieved [Peer](#peer) instance as argument.
+The optional `function` is called with each retrieved [Peer](#peer) instance as argument.
 
 <div markdown='1' class='note'>
 This method is useful for middleware developers that want to forward or send requests to online peers.
@@ -498,7 +502,7 @@ Emitted when a peer connects to Protoo. The [Peer](#peer) instance is given as c
 
 ```javascript
 app.on('online', function(peer) {
-    console.log('peer online [username:%s, uuid:%s]', peer.username, peer.uuid);
+    console.log('peer online: %s', peer);
 });
 ```
 
@@ -510,7 +514,7 @@ Emitted when a peer is disconnected. The [Peer](#peer) instance is given as call
 
 ```javascript
 app.on('offline', function(peer) {
-    console.log('peer offline [username:%s, uuid:%s]', peer.username, peer.uuid);
+    console.log('peer offline: %s', peer);
 });
 ```
 
@@ -528,3 +532,95 @@ app.on('error:route', function(error) {
 
 
 </section>
+
+
+## Peer
+{: #peer}
+
+A peer is a client connected to Protoo. The application is responsible for accepting clients' connections (or rejecting them) and assigning them a `username` and a `uuid`.
+
+When using WebSocket access, a peer is generated within the `requestListener` callback given to [app.websocket()](#app-websocket).
+
+
+### Properties
+{: #peer-properties}
+
+<section markdown='1'>
+
+
+#### peer.username
+{: #peer-username .code}
+
+The account username of the peer. Read-only property.
+
+```javascript
+peer.username;
+// => "alice"
+```
+
+
+#### peer.uuid
+{: #peer-uuid .code}
+
+A unique identificator for the specific device this client connects from. Read-only property.
+
+```javascript
+peer.uuid;
+// => "j36sjh23oi9"
+```
+
+
+#### peer.data
+{: #peer-data .code}
+
+An object with custom data associated to this peer. Both the user application and the routing middleware can write on it at any time. Specific middleware may perform different routing logic based on custom data the user application must provide during the peer creation.
+
+```javascript
+peer.data['role'] = 'admin';
+```
+
+
+#### peer.connected
+{: #peer-connected .code}
+
+Boolean flag indicating whether the peer is currently connected or not. Useful when handling a peer after an asynchronous operation which may take some time, so the peer may have disconnected in the meanwhile.
+
+```javascript
+peer.connected;
+// => true
+```
+
+
+</section>
+
+
+### Methods
+{: #peer-methods}
+
+<section markdown='1'>
+
+
+#### peer.send(req)
+{: #peer-send .code}
+
+Sends the given Protoo [request](#request) to the peer.
+
+Check the usage example in [app.peers()](#app-peers).
+
+
+#### peer.close([code], [reason])
+{: #peer-send .code}
+
+Disconnects the peer.
+
+* `code`: Status code number (defaults to 1000).
+* `reason`: Closure description string (defaults to "normal closure").
+
+<div markdown='1' class='note'>
+When calling this method on a peer connected via WebSocket, the given `code` and `reason` arguments are used to set the WebSocket Close `code` and `reason` fields.
+</div>
+
+
+</section>
+
+

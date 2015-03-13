@@ -19,6 +19,7 @@ body {
 	z-index: 10;
 	width: 100%;
 	background: shade($color-red-light, 25%);
+	@include box-shadow(0px 2px 5px 0px rgba(#666,0.2));
 
 	@include breakpoint($media-big) {
 		position: fixed;
@@ -411,6 +412,7 @@ body {
 	max-height: 70%;
 	overflow: auto;
 	background: rgba($color-brown-dark, 0.95);
+	@include box-shadow(0px -2px 5px 0px rgba(#666,0.2));
 	@include transition-duration(0.2s);
 
 	@include breakpoint($media-small) {
@@ -446,7 +448,7 @@ body {
 
 		> li {
 			display: block;
-			margin: 1.5rem;
+			margin: 0.5rem;
 			font-size: 1rem;
 			line-height: 1.5rem;
 			color: $color-white-light;
@@ -494,6 +496,7 @@ body {
 	border: 1px solid tint($color-black-light, 50%);
 	border-top-left-radius: 6px;
 	border-bottom-left-radius: 6px;
+	border-right: none;
 	@include box-shadow(0px 2px 5px 0px rgba(#666,0.2));
 	cursor: pointer;
 
