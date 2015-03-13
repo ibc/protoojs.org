@@ -108,7 +108,7 @@ The application instance provides methods for:
 <section markdown='1'>
 
 
-The table below lists available application settings.
+The table below lists available application settings:
 
 <div markdown='1' class='table-wrapper'>
 
@@ -291,10 +291,9 @@ Mounting a middleware at a path will cause the middleware function to be execute
 A route will match any mount path which follows its path immediately with a "/". For example: `app.use('/services', ...)` will match **/services**, **/services/multiconference** and so on.
 </div>
 
-`mountPath` can be a string representing a path, a path pattern, a regular expression to match paths, or an array of combinations thereof.
+`mountPath` can be a string representing a path, a path pattern, a regular expression to match paths, or an array of combinations thereof:
 
-
-##### Path
+* Path:
 
 ```javascript
 // Will match any path starting with /abcd
@@ -303,8 +302,7 @@ app.use('/abcd', function(req, next) {
 });
 ```
 
-
-##### Path Pattern
+* Path Pattern:
 
 ```javascript
 // will match paths starting with /abcd and /abd
@@ -318,8 +316,9 @@ app.use('/ab+cd', function(req, next) {
 });
 ```
 
+* Regular Expression:
 
-##### Regular Expression
+Named parameters (see below) cannot be set when using regular expressions for the `mountPath`.
 
 ```javascript
 // will match paths starting with /abc and /xyz
@@ -328,12 +327,20 @@ app.use(/\/abc|\/xyz/, function(req, next) {
 });
 ```
 
-
-##### Array
+* Array:
 
 ```javascript
 // will match paths starting with /abcd, /xyza, /lmn, and /pqr
 app.use(['/abcd', '/xyza', /\/lmn|\/pqr/], function(req, next) {
+    next();
+});
+```
+
+The `app.use()` method supports named parameters that become a field within the [req.params](#req-params) object.
+
+```javascript
+app.use('/services/:service', function(req, next) {
+    console.log('service requested: %s', req.params.service);
     next();
 });
 ```
@@ -348,9 +355,9 @@ You can provide multiple callback functions that behave just like middleware, ex
 
 ```javascript
 app.message('/users/:username/:uuid?', function(req, next) {
-    console.log('processing message [path:%s]', req.path);
+    console.log('processing message request');
 
-    // Invoke next() to pass the control to next middleware.
+    // Invoke next() to pass the control to the next middleware.
     next();
 });
 ```
@@ -365,9 +372,9 @@ It’s useful for mapping "global" logic for specific path prefixes or arbitrary
 
 ```javascript
 app.all('*', function(req, next) {
-    console.log('processing request [method:%s, path:%s]', req.method, req.path);
+    console.log('processing %s request', req.method);
 
-    // Invoke next() to pass the control to next middleware.
+    // Invoke next() to pass the control to the next middleware.
     next();
 });
 ```
@@ -381,13 +388,13 @@ Adds callback triggers to route parameters, where `name` is the name of the para
 For example, when `:user` is present in a route path, you may map user loading logic to automatically store `user` into the request and make it accesible in the whole route, or perform validations on the parameter input.
 
 ```javascript
-app.param('user', function(req, next, userId) {
+app.param('userId', function(req, next, userId) {
     // Get the user details from the User model and attach it to the request object.
     User.find(userId, function(err, user) {
         if (user) {
             // User found, store it into the request.
             req.set('user', user);
-            // Call next() to pass the control to next middleware.
+            // Call next() to pass the control to the next middleware.
             next();
         }
         if (err) {
@@ -399,6 +406,15 @@ app.param('user', function(req, next, userId) {
             next(new Error('user not found'));
         }
     });
+});
+
+app.message('/:userId', function(req, next) {
+    // If here it means that the requested userId has been validated by the
+    // above param rule.
+    console.log('requested userId: %s', req.params.userId);
+    console.log('requested user: %o', req.get('user'));
+
+    // Do something here or pass control to the next middleware by calling next().
 });
 ```
 
@@ -437,11 +453,11 @@ app.route('/users/:username/:uuid?')
     })
     .message(function(req, next) {
         // Just runs for 'message' requests.
-        req.reply(404, 'not found');
+        // Do something here with the request.
     })
     .session(function(req, next) {
         // Just runs for 'session' requests.
-        req.reply(404, 'not found');
+        // Do something here with the request.
     });
 ```
 
@@ -534,6 +550,156 @@ app.on('error:route', function(error) {
 </section>
 
 
+## Router
+{: #router}
+
+A router object is an isolated instance of middleware and routes. You can think of it as a "mini-application" capable only of performing middleware and routing functions. A Protoo `Application` has a built-in router.
+
+A router behaves like middleware itself, so you can use it as an argument to [app.use()](#app-use) or as the argument to another router’s [use()](#router-use) method.
+
+Given a Protoo `Application` a new `Router` can be created using the [app.Router()](#app-Router) method, which creates a new `Router` instance by inheriting the `app` settings.
+
+`app.Router([options])` accepts an object with the following options:
+
+<div markdown='1' class='table-wrapper'>
+
+Property        | Type     | Description                     |  Default
+--------------- | -------- | ------------------------------- | -------------
+`caseSensitive` | Boolean  | Enable case sensitivity. Inherits from the application `case sensitive routing` setting. | Disabled. Treats “/Services” and “/services as the same.
+`strict`        | Boolean  | Enable strict routing. Inherits from the application `strict routing` setting. | Disabled. Treats “/services/” and “/services as the same.
+`mergeParams`   | Boolean  | Preserve [req.params](#req-params) values from the parent router. If the parent and the child have conflicting param names the child’s value take precedence. | `false` 
+
+</div>
+
+
+### Methods
+{: #router-methods}
+
+<section markdown='1'>
+
+
+#### router.use([mountPath], [function, …] function)
+{: #router-use .code}
+
+Uses the given middleware `function`(s) with optional mount path `mountPath`, that defaults to "/". This method is similar to [app.use()](#app-use).
+
+Middleware is like a plumbing pipe. Requests start at the first middleware you define and work their way "down" the middleware stack processing for each path they match.
+
+```javascript
+var protoo = require('protoo');
+var app = protoo();
+var router = protoo.Router();
+
+router.use(function(req, next) {
+    // Will match any request with path starting with /users.
+    next();
+});
+
+// Mount the router in "/users" path.
+app.use('/users', router);
+```
+
+The `mountPath` path is stripped and is **not** visible to the middleware function. The main effect of this feature is that mounted middleware may operate without code changes regardless of its "prefix" path.
+
+The order in which middlewares are defined with `router.use()` is very important as they are invoked sequentially, thus the order defines middleware precedence.
+
+The `router.use()` method also supports named parameters so that your mount points for other routers can benefit from preloading using named parameters.
+
+```javascript
+router.use('/:username', function(req, next) {
+    // Will match any request with path starting with /users followed by a
+    // slash and a string that will become req.params.username.
+    console.log('username: %s', req.params.username);
+    next();
+});
+
+app.use('/users', router);
+```
+
+
+#### router.METHOD(path, [function, …] function)
+{: #router-METHOD .code}
+
+Same functionality as the provided by the [app.METHOD()](#app-METHOD) method, but within the isolated instance of middleware and routes in the `router`.
+
+```javascript
+router.session('/:username/:uuid?', function(req, next) {
+    console.log('processing session request for user %s', req.params.username);
+    next();
+});
+
+router.message('/:username/:uuid?', function(req, next) {
+    console.log('processing message request for user %s', req.params.username);
+    next();
+});
+```
+
+
+#### router.all(path, [function, …] function)
+{: #router-all .code}
+
+Same functionality as the provided by the [app.all()](#app-all) method, but within the isolated instance of middleware and routes in the `router`.
+
+```javascript
+router.all('/:username/:uuid?', function(req, next) {
+    console.log('processing %s request', req.method);
+    next();
+});
+```
+
+
+#### router.param(name, function)
+{: #router-param .code}
+
+Same functionality as the provided by the [app.param()](#app-param) method, but within the isolated instance of middleware and routes in the `router`.
+
+```javascript
+router.param('service', function(req, next, service) {
+    // Validate service.
+    if (service !== 'conference' && service !== 'echo') {
+        // Reject the request and finish the routing logic.
+        req.reply('404', 'service not available');
+        return;
+    }
+
+    next();
+});
+
+router.session('/:service', function(req, next) {
+    // If here it means that the requested service has been validated by the
+    // above param rule.
+    console.log('requested service: %s', req.params.service);
+
+    // Do something here or pass control to the next middleware by calling next().
+});
+```
+
+
+#### router.route(path)
+{: #router-route .code}
+
+Same functionality as the provided by the [app.route()](#app-route) method, but within the isolated instance of middleware and routes in the `router`.
+
+```javascript
+router.route('/:username/:uuid?')
+    .all(function(req, next) {
+        // Runs for all Protoo requests first.
+        next();
+    })
+    .message(function(req, next) {
+        // Just runs for 'message' requests.
+        // Do something here with the request.
+    })
+    .session(function(req, next) {
+        // Just runs for 'session' requests.
+        // Do something here with the request.
+    });
+```
+
+
+</section>
+
+
 ## Peer
 {: #peer}
 
@@ -603,18 +769,20 @@ peer.connected;
 #### peer.send(req)
 {: #peer-send .code}
 
-Sends the given Protoo [request](#request) to the peer.
+Sends the given Protoo [request](#req) to the peer.
 
 Check the usage example in [app.peers()](#app-peers).
 
 
 #### peer.close([code], [reason])
-{: #peer-send .code}
+{: #peer-close .code}
 
 Disconnects the peer.
 
 * `code`: Status code number (defaults to 1000).
 * `reason`: Closure description string (defaults to "normal closure").
+
+`code` values inherit the same semantics as those defined in the [WebRTC RFC 6455](https://tools.ietf.org/html/rfc6455#section-7.4).
 
 <div markdown='1' class='note'>
 When calling this method on a peer connected via WebSocket, the given `code` and `reason` arguments are used to set the WebSocket Close `code` and `reason` fields.
@@ -624,3 +792,266 @@ When calling this method on a peer connected via WebSocket, the given `code` and
 </section>
 
 
+## Request
+{: #req}
+
+A `Request` represents a Protoo protocol request message. For further information check the Protoo's [protocol](/documentation/protocol) documentation.
+
+A `Request` instance is created by the Protoo server when a [peer](#peer) sends a request to it. It can also be generated by the application running on top of Protoo and be sent to online peers.
+
+A Protoo request message is a JSON body with mandatory and optional fields.
+
+```javascript
+{
+    "method" : "message",
+    "path"   : "/users/alice",
+    "id"     : "jhk3ghj9sd",
+    "data"   : {
+        [...]
+    }
+}
+```
+
+Note however that the `Request` instance includes properties other than those present in the JSON body.
+
+
+### Properties
+{: #req-properties}
+
+<section markdown='1'>
+
+
+#### req.method
+{: #req-method .code}
+
+The Protoo method of the request. Mandatory field in the JSON body.
+
+```javascript
+req.method;
+// => "session"
+```
+
+
+#### req.path
+{: #req-path .code}
+
+The requested path of the request. Mandatory field in the JSON body.
+
+Resources in the Protoo protocol are defined as URL paths.
+
+```javascript
+req.path;
+// => "/users/alice"
+```
+
+
+#### req.id
+{: #req-id .code}
+
+The transaction identifier. Mandatory field in the JSON body.
+
+A transaction involves both a single request and one or more [responses](#res). The `id` value is common for a request and its responses.
+
+```javascript
+req.id;
+// => "sajhkj78sdjhjhk"
+```
+
+
+#### req.data
+{: #req-data .code}
+
+An object with the required data for specific method and usages. Optional field in the JSON body.
+
+```javascript
+req.data;
+// => { "type": "text", "text": "Hi Alice!" }
+```
+
+
+#### req.sender
+{: #req-sender .code}
+
+An object with information about the sender of the request (usually a [peer](#peer)). This field can only be added to the JSON body by the Protoo server when the application forwards an incoming request to any online peer, or when the application generates a request by its own.
+
+<div markdown='1' class='note'>
+If a request containing a `sender` field is received by the Protoo server it is ignored, as the server determines the source peer by the transport from which the request was received.
+</div>
+
+When the sender of a request is a peer, the `sender` field has the following fields:
+
+* `username`:  The username of the peer who sent the request.
+* `uuid`:  The uuid of the peer who sent the request.
+
+```javascript
+req.sender;
+// => { "username": "bob", "uuid": "kjh87jhgas0j" }
+```
+
+
+#### req.peer
+{: #req-peer .code}
+
+The [Peer](#peer) instance from which this request was originated.
+
+
+#### req.app
+{: #req-app .code}
+
+A referente to the Protoo [Application](#app) handling this request.
+
+
+#### req.params
+{: #req-params .code}
+
+An object which is filled by the rougin logic when named parameters are used by the middlewares matched by this request. See [app-param()](#app-param) and [router-param()](#router-param) for further information.
+
+
+#### req.ended
+{: #req-ended .code}
+
+A boolean which is set to `true` by the Protoo server once the incoming request has been replied with a final [response](#response) (status code between 200 and 699).
+
+
+</section>
+
+
+### Methods
+{: #req-methods}
+
+<section markdown='1'>
+
+
+#### req.set(name, value)
+{: #req-set .code}
+
+Assigns the custom property `name` to `value`. Key/values set with this method can be later retrieved using the [req.get()](#req-get) method.
+
+```javascript
+req.set('role', 'guest');
+```
+
+
+#### req.get(name)
+{: #req-get .code}
+
+Retrieves a custom property `name` previously set with the [req.set()](#req-set) method.
+
+```javascript
+req.get('role');
+// => "guest"
+```
+
+
+#### req.reply(status, [reason], [data])
+{: #req-reply .code}
+
+Sends a Protoo [response](#res) for this request. For more information check the Protoo's [protocol](/documentation/protocol) documentation.
+
+* `status`: A number indicating the status code (200-699).
+* `reason`: A descritive string.
+* `data`: An optional object with custom fields.
+
+All these arguments are mapped into their respective fields in the generated JSON body.
+
+```javascript
+req.reply(404, 'Not Found');
+```
+
+
+#### req.onresponse(callback(res))
+{: #req-onresponse .code}
+
+Adds a listener for every future response associated to this request. The given `callback` is called with the [Response](#res) instance as argument.
+
+Callbacks are executed in reverse order.
+
+```javascript
+req.onresponse(function(res) {
+    console.log('callback #1');
+});
+
+req.onresponse(function(res) {
+    console.log('callback #2');
+});
+
+req.reply(200, 'OK');
+// => "callback #2"
+// => "callback #1"
+```
+
+
+</section>
+
+
+## Response
+{: #res}
+
+A `Response` represents a Protoo protocol response message. For further information check the Protoo's [protocol](/documentation/protocol) documentation.
+
+A `Response` instance is created by the Protoo server when calling [req.reply()](#req-reply). It is also generated by online peers when they receive a request from the Protoo server.
+
+A Protoo response message is a JSON body with mandatory and optional fields.
+
+```javascript
+{
+    "status" : 200,
+    "reason" : "OK",
+    "id"     : "jhk3ghj9sd",
+    "data"   : {
+        [...]
+    }
+}
+```
+
+
+### Properties
+{: #res-properties}
+
+<section markdown='1'>
+
+
+#### res.status
+{: #res-status .code}
+
+The Protoo status code of the response. Mandatory field in the JSON body.
+
+```javascript
+res.status;
+// => 200
+```
+
+
+#### res.reason
+{: #res-reason .code}
+
+The descritive reason phrase of the response. Mandatory field in the JSON body.
+
+```javascript
+res.reason;
+// => "OK"
+```
+
+
+#### res.id
+{: #res-id .code}
+
+The transaction identifier. Mandatory field in the JSON body.
+
+Its value matches that in the [request](#req) this response is associated to.
+
+```javascript
+res.id;
+// => "sajhkj78sdjhjhk"
+```
+
+
+#### res.data
+{: #res-data .code}
+
+An object with the required data for specific method and usages. Optional field in the JSON body.
+
+```javascript
+res.data;
+// => { "foo": 1234 }
+```
