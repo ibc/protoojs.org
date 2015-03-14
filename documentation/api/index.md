@@ -115,9 +115,9 @@ The table below lists available application settings:
 Setting Name             | Type    | Value         | Default
 ------------------------ | ------- | ------------- | -------------
 `env`                    | String  | Environment mode. | `NODE_ENV` environment variable or "development".
-`case sensitive routing` | Boolean | Enable case sensitivity. | Disabled. Treats "/Users" and "/users" as the same.
-`strict routing`         | Boolean | Enable strict routing. | Disabled. Treats "/users/" and "/users" as the same.
-`disconnection grace period` | Number | Milliseconds to wait for a peer to reconnect before emitting 'offline'. Useful for website reload in the browser. | 0 (disabled).
+`case sensitive routing` | Boolean | Enable case sensitivity. | `false`, treats "/Users" and "/users" as the same.
+`strict routing`         | Boolean | Enable strict routing. | `false`, treats "/users/" and "/users" as the same.
+`disconnect grace period` | Number | Milliseconds to wait for a peer to reconnect before emitting 'offline'. Useful for website reload in the browser. | 0 (disabled).
 
 </div>
 
@@ -146,7 +146,7 @@ app.get('env');
 #### app.enable(name)
 {: #app-enable .code}
 
-Sets the Boolean setting `name` to `true`. Has the same effect as calling `set(name, true)`.
+Sets the Boolean setting `name` to `true`. Has the same effect as calling `app.set(name, true)`.
 
 ```javascript
 app.enable('strict routing');
@@ -156,7 +156,7 @@ app.enable('strict routing');
 #### app.disable(name)
 {: #app-disable .code}
 
-Sets the Boolean setting `name` to `false`. Has the same effect as calling `set(name, false)`.
+Sets the Boolean setting `name` to `false`. Has the same effect as calling `app.set(name, false)`.
 
 ```javascript
 app.disable('case sensitive routing');
@@ -293,7 +293,7 @@ A route will match any mount path which follows its path immediately with a "/".
 
 `mountPath` can be a string representing a path, a path pattern, a regular expression to match paths, or an array of combinations thereof:
 
-* Path:
+##### Path
 
 ```javascript
 // Will match any path starting with /abcd
@@ -302,7 +302,7 @@ app.use('/abcd', function(req, next) {
 });
 ```
 
-* Path Pattern:
+##### Path Pattern
 
 ```javascript
 // will match paths starting with /abcd and /abd
@@ -316,7 +316,7 @@ app.use('/ab+cd', function(req, next) {
 });
 ```
 
-* Regular Expression:
+##### Regular Expression
 
 Named parameters (see below) cannot be set when using regular expressions for the `mountPath`.
 
@@ -327,7 +327,7 @@ app.use(/\/abc|\/xyz/, function(req, next) {
 });
 ```
 
-* Array:
+##### Array
 
 ```javascript
 // will match paths starting with /abcd, /xyza, /lmn, and /pqr
@@ -336,7 +336,7 @@ app.use(['/abcd', '/xyza', /\/lmn|\/pqr/], function(req, next) {
 });
 ```
 
-The `app.use()` method supports named parameters that become a field within the [req.params](#req-params) object.
+The `app.use()` method supports named parameters that become new fields within the [req.params](#req-params) object.
 
 ```javascript
 app.use('/services/:service', function(req, next) {
@@ -368,7 +368,7 @@ app.message('/users/:username/:uuid?', function(req, next) {
 
 This method is like the standard [app.METHOD()](#app-METHOD) methods, except it matches all Protoo methods.
 
-It’s useful for mapping "global" logic for specific path prefixes or arbitrary matches regardless which method the request has.
+It's useful for mapping "global" logic for specific path prefixes or arbitrary matches regardless which method the request has.
 
 ```javascript
 app.all('*', function(req, next) {
@@ -426,7 +426,7 @@ A param callback will be called only once in a request-response cycle, even if t
 app.param('username', function (req, next, username) {
     console.log('CALLED ONLY ONCE');
     next();
-})
+});
 
 app.message('/user/:username', function (req, next) {
     console.log('although this matches');
@@ -535,13 +535,13 @@ app.on('offline', function(peer) {
 ```
 
 
-#### app.on('error:route', callback(error))
-{: #app-on-error-route .code}
+#### app.on('routingError', callback(error))
+{: #app-on-routingError .code}
 
 Emitted when an error throws in runtime while routing/dispatching a request. The `Error` instance is given as callback parameter.
 
 ```javascript
-app.on('error:route', function(error) {
+app.on('routingError', function(error) {
     console.error('routing error: %s', error);
 });
 ```
@@ -553,9 +553,9 @@ app.on('error:route', function(error) {
 ## Router
 {: #router}
 
-A router object is an isolated instance of middleware and routes. You can think of it as a "mini-application" capable only of performing middleware and routing functions. A Protoo `Application` has a built-in router.
+A router object is an isolated instance of middleware and routes. You can think of it as a "mini-application" capable only of performing middleware and routing functions. A Protoo application has a built-in router.
 
-A router behaves like middleware itself, so you can use it as an argument to [app.use()](#app-use) or as the argument to another router’s [use()](#router-use) method.
+A router behaves like middleware itself, so you can use it as an argument to [app.use()](#app-use) or as the argument to another router's [use()](#router-use) method.
 
 Given a Protoo `Application` a new `Router` can be created using the [app.Router()](#app-Router) method, which creates a new `Router` instance by inheriting the `app` settings.
 
@@ -565,9 +565,9 @@ Given a Protoo `Application` a new `Router` can be created using the [app.Router
 
 Property        | Type     | Description                     |  Default
 --------------- | -------- | ------------------------------- | -------------
-`caseSensitive` | Boolean  | Enable case sensitivity. Inherits from the application `case sensitive routing` setting. | Disabled. Treats “/Services” and “/services as the same.
-`strict`        | Boolean  | Enable strict routing. Inherits from the application `strict routing` setting. | Disabled. Treats “/services/” and “/services as the same.
-`mergeParams`   | Boolean  | Preserve [req.params](#req-params) values from the parent router. If the parent and the child have conflicting param names the child’s value take precedence. | `false` 
+`caseSensitive` | Boolean  | Enable case sensitivity. Inherits from the application `case sensitive routing` setting. | `false`, treats “/Services” and “/services as the same.
+`strict`        | Boolean  | Enable strict routing. Inherits from the application `strict routing` setting. | `false`, treats “/services/” and “/services as the same.
+`mergeParams`   | Boolean  | Preserve [req.params](#req-params) values from the parent router. If the parent and the child have conflicting param names the child's value take precedence. | `false` (disabled).
 
 </div>
 
@@ -948,7 +948,7 @@ req.get('role');
 
 Sends a Protoo [response](#res) for this request. For more information check the Protoo's [protocol](/documentation/protocol) documentation.
 
-* `status`: A number indicating the status code (200-699).
+* `status`: A number indicating the status code (100-699).
 * `reason`: A descritive string.
 * `data`: An optional object with custom fields.
 
@@ -958,28 +958,43 @@ All these arguments are mapped into their respective fields in the generated JSO
 req.reply(404, 'Not Found');
 ```
 
+<div markdown='1' class='note warn'>
+Final responses are those with `status` between 200 and 699. If `reply()` is called on a request for which a final response was already sent (so `req.ended === true`) this method throws an error.
 
-#### req.onresponse(callback(res))
-{: #req-onresponse .code}
+`next()` is ignored if called after replying a request with a final response.
+</div>
 
-Adds a listener for every future response associated to this request. The given `callback` is called with the [Response](#res) instance as argument.
 
-Callbacks are executed in reverse order.
+</section>
+
+
+### Events
+{: #app-events}
+
+<section markdown='1'>
+    
+
+The request inherits from the Node [EventEmitter](https://nodejs.org/api/events.html#events_class_events_eventemitter) class. The list of emitted events is described below.
+
+
+#### req.on('outgoingResponse', callback(res))
+{: #req-on-outgoingResponse .code}
+
+Emitted for each response generated by Protoo during the request routing process. The [Response](#res) instance is given as callback parameter.
 
 ```javascript
-req.onresponse(function(res) {
-    console.log('callback #1');
+app.use(function(req, next) {
+    req.on('outgoingResponse', function(res) {
+        console.log('replying %d response', res.status);
+    });
+
+    req.reply(100, 'trying');
+    req.reply(200, 'ok');
 });
 
-req.onresponse(function(res) {
-    console.log('callback #2');
-});
-
-req.reply(200, 'OK');
-// => "callback #2"
-// => "callback #1"
+// => "replying 100 response"
+// => "replying 200 response"
 ```
-
 
 </section>
 

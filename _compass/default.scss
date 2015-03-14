@@ -283,7 +283,7 @@ body {
 		margin-bottom: 1.5rem !important;
 
 		// Force white background.
-		&, * {
+		& {
 			background-color: #fff !important;
 		}
 
@@ -296,7 +296,7 @@ body {
 		font-family: Consolas, Monaco, 'Andale Mono', monospace;
 		font-size: 0.9rem;
 		color: $color-brown-light;
-		// white-space: pre;
+		white-space: pre;
 		background-color: #fff !important;
 		border: 1px solid #ddd !important;
 		padding: 1px 2px;
@@ -312,14 +312,21 @@ body {
 	}
 
 	div.note {
-		$color: #74ccd3;
+		$bg-color: #74ccd3;
 
 		margin: 2rem 2rem;
 		padding: 1rem;
 		font-size: 0.9rem;
-		background: tint($color, 75%);
-		border: 1px solid shade($color, 0%);
+		background: tint($bg-color, 75%);
+		border: 1px solid shade($bg-color, 0%);
 		border-radius: 5px;
+
+		&.warn {
+			$bg-color: $color-red-light;
+
+			background: tint($bg-color, 75%);
+			border: 1px solid shade($bg-color, 0%);
+		}
 
 		> *:first-child {
 			margin-top: 0 !important;
