@@ -606,14 +606,17 @@ The order in which middlewares are defined with `router.use()` is very important
 The `router.use()` method also supports named parameters so that your mount points for other routers can benefit from preloading using named parameters.
 
 ```javascript
-router.use('/:username', function(req, next) {
-    // Will match any request with path starting with /users followed by a
-    // slash and a string that will become req.params.username.
+var protoo = require('protoo');
+var app = protoo();
+var router = protoo.Router({mergeParams: true});
+
+router.use('/:uuid', function(req, next) {
     console.log('username: %s', req.params.username);
+    console.log('uuid: %s', req.params.uuid);
     next();
 });
 
-app.use('/users', router);
+app.use('/users/:username', router);
 ```
 
 
@@ -848,13 +851,13 @@ req.path;
 #### req.id
 {: #req-id .code}
 
-The transaction identifier. Mandatory field in the JSON body.
+The transaction identifier number. Mandatory field in the JSON body.
 
 A transaction involves both a single request and one or more [responses](#res). The `id` value is common for a request and its responses.
 
 ```javascript
 req.id;
-// => "sajhkj78sdjhjhk"
+// => 38976167
 ```
 
 

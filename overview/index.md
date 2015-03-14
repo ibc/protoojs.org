@@ -63,7 +63,7 @@ Here a very simple and functional instant messaging server is implemented. Peers
 {
     "method" : "message",
     "path"   : "/users/bob",
-    "id"     : "sajg763tjau2",
+    "id"     : 45983751,
     "data"   : {
         "type" : "text",
         "text" : "hi Bob!"
