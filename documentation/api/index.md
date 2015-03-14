@@ -2,6 +2,7 @@
 title: API
 code: true
 toc: true
+anchors: true
 ---
 
 
@@ -194,12 +195,12 @@ app.disabled('case sensitive routing');
 <section markdown='1'>
 
 
-#### app.websocket(httpServer, requestListener)
+#### app.websocket(httpServer, [options], requestListener)
 {: #app-websocket .code}
 
 Adds a WebSocket server to the application.
 
-The `httpServer` parameter must be a Node [http.Server](https://nodejs.org/api/http.html#http_class_http_server) or [https.Server](https://nodejs.org/api/https.html#https_class_https_server) instance or a compatible one (such as [node-sdpy](https://github.com/indutny/node-spdy)). The user is responsible for binding the HTTP server into the desired IP and port.
+The `httpServer` argument must be a Node [http.Server](https://nodejs.org/api/http.html#http_class_http_server) or [https.Server](https://nodejs.org/api/https.html#https_class_https_server) instance or a compatible one (such as [node-sdpy](https://github.com/indutny/node-spdy)). The user is responsible for binding the HTTP server into the desired IP and port.
 
 <div markdown='1' class='note'>
 If the given HTTP server is not being driven by Express or any other HTTP server it is recommended to handle HTTP requests others than "upgrade" by replying them with status 404. That avoids persistent TCP connections if a browser sends a common HTTP request to the Protoo server.
@@ -211,6 +212,8 @@ var httpServer = http.createServer(function(req, res) {
 });
 ```
 </div>
+
+The `options` argument is an object to be passed to the WebSocket-Node [WebSocketServer](https://github.com/theturtle32/WebSocket-Node/blob/master/docs/WebSocketServer.md#server-config-options) instance (note however that the `httpServer` option is not necessary as it is already given as the first argument of this method).
 
 The `requestListener` argument is a callback for handling clients' WebSocket connection requests. It is called with the following parameters:
 
@@ -808,9 +811,10 @@ A Protoo request message is a JSON body with mandatory and optional fields.
 {
     "method" : "message",
     "path"   : "/users/alice",
-    "id"     : "jhk3ghj9sd",
+    "id"     : 38976167,
     "data"   : {
-        [...]
+        "type" : "text",
+        "text" : "Hi Alice!"
     }
 }
 ```
@@ -831,7 +835,7 @@ The Protoo method of the request. Mandatory field in the JSON body.
 
 ```javascript
 req.method;
-// => "session"
+// => "message"
 ```
 
 
@@ -868,7 +872,7 @@ An object with the required data for specific method and usages. Optional field 
 
 ```javascript
 req.data;
-// => { "type": "text", "text": "Hi Alice!" }
+// => { type: "text", text: "Hi Alice!" }
 ```
 
 
@@ -888,7 +892,7 @@ When the sender of a request is a peer, the `sender` field has the following fie
 
 ```javascript
 req.sender;
-// => { "username": "bob", "uuid": "kjh87jhgas0j" }
+// => { username: "bob", uuid: "kjh87jhgas0j" }
 ```
 
 
@@ -1015,9 +1019,9 @@ A Protoo response message is a JSON body with mandatory and optional fields.
 {
     "status" : 200,
     "reason" : "OK",
-    "id"     : "jhk3ghj9sd",
+    "id"     : 9812873,
     "data"   : {
-        [...]
+        "foo" : 1234
     }
 }
 ```
@@ -1060,7 +1064,7 @@ Its value matches that in the [request](#req) this response is associated to.
 
 ```javascript
 res.id;
-// => "sajhkj78sdjhjhk"
+// => 9812873
 ```
 
 
@@ -1071,5 +1075,5 @@ An object with the required data for specific method and usages. Optional field 
 
 ```javascript
 res.data;
-// => { "foo": 1234 }
+// => { foo: 1234 }
 ```

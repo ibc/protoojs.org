@@ -8,18 +8,35 @@
 		<link rel='apple-touch-icon' sizes='180x180' href='/images/apple-icon-180x180.png'>
 		<link rel='icon' type='image/png' sizes='192x192' href='/images/android-icon-192x192.png'>
 		<link href='http://fonts.googleapis.com/css?family=Open+Sans|Poiret+One' rel='stylesheet'>
+
 		<script src='/js/fastclick.js'></script>
+		<script>
+			window.addEventListener('load', function() {
+				new FastClick(document.body);
+			}, false);
+		</script>
 
 		{% if page.home %}
-			<link rel='stylesheet' href='/css/home.css' media='screen, projection'>
+			<link rel='stylesheet' href='/css/home.css'>
 		{% else %}
-			<link rel='stylesheet' href='/css/default.css' media='screen, projection'>
+			<link rel='stylesheet' href='/css/default.css'>
 			<script src='/js/menu.js'></script>
 		{% endif %}
 
 		{% if page.code %}
-			<link rel='stylesheet' href='/css/prism.css'>
 			<script src='/js/prism.js'></script>
+			<link rel='stylesheet' href='/css/prism.css'>
+		{% endif %}
+
+		{% if page.anchors %}
+			<script src='/js/anchor.min.js'></script>
+			<link rel='stylesheet' href='/css/anchor.css'>
+
+			<script>
+				window.addEventListener('load', function() {
+					addAnchors('.content h2, .content h3, .content h4');
+				});
+			</script>
 		{% endif %}
 
 		{% if page.toc %}
@@ -29,13 +46,6 @@
 
 
 	<body>
-
-		<script>
-			window.addEventListener('load', function() {
-				new FastClick(document.body);
-			}, false);
-		</script>
-
 
 		{% if page.home != true %}
 			<div class='top-bar'>
