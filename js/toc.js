@@ -1,15 +1,35 @@
 window.addEventListener('load', function() {
 
 	var tocButton = document.querySelector('.toc-button'),
-		toc = document.querySelector('.toc-wrapper');
+		toc = document.querySelector('.toc-wrapper'),
+		tocUl = document.querySelector('.toc-wrapper ul.toc'),
+		transitionDuration = 200;
+
+	function showToc() {
+		if (toc.classList.contains('visible')) { return; }
+
+		toc.classList.add('visible');
+		tocUl.style.display = '';
+	}
+
+	function hideToc() {
+		if (! toc.classList.contains('visible')) { return; }
+
+		toc.classList.remove('visible');
+		setTimeout(function() {
+			if (! toc.classList.contains('visible')) {
+				tocUl.style.display = 'none';
+			}
+		}, transitionDuration * 1.5);
+	}
 
 	// Click on the TOC button shows/hides the TOC panel.
 	tocButton.addEventListener('click', function(event) {
 		if (! toc.classList.contains('visible')) {
-			toc.classList.add('visible');
+			showToc();
 		}
 		else {
-			toc.classList.remove('visible');
+			hideToc();
 		}
 	}, false);
 
@@ -17,13 +37,13 @@ window.addEventListener('load', function() {
 	window.addEventListener('keydown', function(event) {
 		// ESC
 		if (event.keyCode === 27) {
-			toc.classList.remove('visible');
+			hideToc();
 		}
 	}, false);
 
 	// Click on the whole page hides the TOC panel,
 	document.body.addEventListener('click', function(event) {
-		toc.classList.remove('visible');
+		hideToc();
 	}, false);
 	// ...unless it is the TOC button,
 	tocButton.addEventListener('click', function(event) {
