@@ -84,6 +84,21 @@ var app = protoo();
 ```
 
 
+#### protoo.addMethod(method)
+{: #protoo-addMethod .code}
+
+Adds a custom Protoo method to **protoo**. The given string becomes a new prototype method of both the [Application](#app) and the [Router](#router) classes.
+
+```javascript
+protoo.addMethod('chicken');
+
+app.chicken('*', function(req, next) {
+    console.log('chicken request received');
+    next();
+});
+```
+
+
 </section>
 
 
@@ -882,7 +897,7 @@ req.data;
 An object with information about the sender of the request (usually a [peer](#peer)). This field can only be added to the JSON body by the Protoo server when the application forwards an incoming request to any online peer, or when the application generates a request by its own.
 
 <div markdown='1' class='note'>
-If a request containing a `sender` field is received by the Protoo server it is ignored, as the server determines the source peer by the transport from which the request was received.
+If a request containing a `sender` field is received by the Protoo server it would be ignored. The server determines the source peer by the transport from which the request is received.
 </div>
 
 When the sender of a request is a peer, the `sender` field has the following fields:
