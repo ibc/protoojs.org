@@ -98,6 +98,10 @@ app.chicken('*', function(req, next) {
 });
 ```
 
+<div markdown='1' class='note warn'>
+If the given `method` is already an [Application](#app) or [Router](#router) prototype method, `addMethod()` throws an error.
+</div>
+
 
 </section>
 
@@ -133,7 +137,7 @@ Setting Name             | Type    | Value         | Default
 `env`                    | String  | Environment mode. | `NODE_ENV` environment variable or "development".
 `case sensitive routing` | Boolean | Enable case sensitivity. | `false`, treats "/Users" and "/users" as the same.
 `strict routing`         | Boolean | Enable strict routing. | `false`, treats "/users/" and "/users" as the same.
-`disconnect grace period` | Number | Milliseconds to wait for a peer to reconnect before emitting 'offline'. Useful for website reload in the browser. | 0 (disabled).
+`disconnect grace period` | Number | Milliseconds to wait for a peer to reconnect before emitting event "offline". Useful for page reload or widget detach in a browser. | 0 (disabled).
 
 </div>
 
@@ -298,7 +302,7 @@ If `closeServers` is set to `true` then underlying servers (such as the HTTP ser
 For a better understanding of how routing works check the [Routing](/documentation/routing/) documentation.
 
 
-#### app.use([mountPath], [function, ...] function)
+#### app.use([mountPath], [function, ...], function)
 {: #app-use .code}
 
 Mounts the middleware `function`(s) at the `mountPath`. If `mountPath` is not specified it defaults to "/".
@@ -364,7 +368,7 @@ app.use('/services/:service', function(req, next) {
 ```
 
 
-#### app.METHOD(path, [function, ...] function)
+#### app.METHOD(path, [function, ...], function)
 {: #app-METHOD .code}
 
 Routes a Protoo request where METHOD is the Protoo method of the request, such as "message", "session", and so on. The middleware function(s) are invoked just if the path of the request matches the given `path`.
@@ -381,7 +385,7 @@ app.message('/users/:username/:uuid?', function(req, next) {
 ```
 
 
-#### app.all(path, [function, ...] function)
+#### app.all(path, [function, ...], function)
 {: #app-all .code}
 
 This method is like the standard [app.METHOD()](#app-METHOD) methods, except it matches all Protoo methods.
@@ -517,6 +521,26 @@ app.route('/users/:username/:uuid?')
 ```
 
 
+#### app.peer(username, uuid)
+{: #app-peer .code}
+
+Returns the online [Peer](#peer) instance with the given `username` and `uuid`, or `undefined` if not found.
+
+```javascript
+app.message('/users/:username/:uuid', function(req, next) {
+    var peer;
+
+    peer = app.peer(req.params.username, req.params.uuid);
+    if (peer) {
+        peer.send(req);
+    }
+    else {
+        req.reply(404, 'peer not found');
+    }
+});
+```
+
+
 </section>
 
 
@@ -596,7 +620,7 @@ Property        | Type     | Description                     |  Default
 <section markdown='1'>
 
 
-#### router.use([mountPath], [function, …] function)
+#### router.use([mountPath], [function, ...], function)
 {: #router-use .code}
 
 Uses the given middleware `function`(s) with optional mount path `mountPath`, that defaults to "/". This method is similar to [app.use()](#app-use).
@@ -638,7 +662,7 @@ app.use('/users/:username', router);
 ```
 
 
-#### router.METHOD(path, [function, …] function)
+#### router.METHOD(path, [function, ...], function)
 {: #router-METHOD .code}
 
 Same functionality as the provided by the [app.METHOD()](#app-METHOD) method, but within the isolated instance of middleware and routes in the `router`.
@@ -656,7 +680,7 @@ router.message('/:username/:uuid?', function(req, next) {
 ```
 
 
-#### router.all(path, [function, …] function)
+#### router.all(path, [function, ...], function)
 {: #router-all .code}
 
 Same functionality as the provided by the [app.all()](#app-all) method, but within the isolated instance of middleware and routes in the `router`.
@@ -813,6 +837,30 @@ When calling this method on a peer connected via WebSocket, the given `code` and
 </section>
 
 
+### Events
+{: #peer-events}
+
+<section markdown='1'>
+    
+
+The peer inherits from the Node [EventEmitter](https://nodejs.org/api/events.html#events_class_events_eventemitter) class. The list of emitted events is described below.
+
+
+#### peer.on('offline', callback())
+{: #peer-on-online .code}
+
+Emitted when the peer is disconnected.
+
+```javascript
+peer.on('offline', function() {
+    console.log('peer offline: %s', peer);
+});
+```
+
+
+</section>
+
+
 ## Request
 {: #req}
 
@@ -920,13 +968,13 @@ The [Peer](#peer) instance from which this request was originated.
 #### req.app
 {: #req-app .code}
 
-A referente to the Protoo [Application](#app) handling this request.
+A reference to the Protoo [Application](#app) handling this request.
 
 
 #### req.params
 {: #req-params .code}
 
-An object which is filled by the rougin logic when named parameters are used by the middlewares matched by this request. See [app-param()](#app-param) and [router-param()](#router-param) for further information.
+An object which is filled by the rougin logic when named parameters are used by the middlewares matched by this request. See [app.param()](#app-param) and [router.param()](#router-param) for further information.
 
 
 #### req.ended
@@ -991,7 +1039,7 @@ Final responses are those with `status` between 200 and 699. If `reply()` is cal
 
 
 ### Events
-{: #app-events}
+{: #req-events}
 
 <section markdown='1'>
     
@@ -1002,7 +1050,7 @@ The request inherits from the Node [EventEmitter](https://nodejs.org/api/events.
 #### req.on('outgoingResponse', callback(res))
 {: #req-on-outgoingResponse .code}
 
-Emitted for each response generated by Protoo during the request routing process. The [Response](#res) instance is given as callback parameter.
+Emitted for each response generated by Protoo during the request routing process by means of [req.reply()](#req-reply). The [Response](#res) instance is given as callback parameter.
 
 ```javascript
 app.use(function(req, next) {
