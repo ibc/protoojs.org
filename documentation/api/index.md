@@ -232,7 +232,7 @@ var httpServer = http.createServer(function(req, res) {
 ```
 </div>
 
-The `options` argument is an object to be passed to the WebSocket-Node [WebSocketServer](https://github.com/theturtle32/WebSocket-Node/blob/master/docs/WebSocketServer.md#server-config-options) instance (note however that the `httpServer` option is not necessary as it is already given as the first argument of this method).
+The `options` argument is an object to be passed to the WebSocket-Node [WebSocketServer](https://github.com/theturtle32/WebSocket-Node/blob/master/docs/WebSocketServer.md#server-config-options) instance (note however that the `httpServer` option is not necessary as it is already given in the first argument of this method).
 
 The `requestListener` argument is a callback for handling clients' WebSocket connection requests. It is called with the following parameters:
 
@@ -281,13 +281,17 @@ app.websocket(httpServer, function(info, accept, reject) {
 });
 ```
 
+<div markdown='1' class='note warn'>
+Upon a client WebSocket connection attempt, `accept()` or `reject()` **must** be called on it. However it can be called later after an asynchronous operation (if for example a database query is required before accepting or rejecting the connection).
+</div>
+
 
 #### app.close([closeServers])
 {: #app-close .code}
 
 Closes the application and disconnect existing peers.
 
-If `closeServers` is set to `true` then underlying servers (such as the HTTP servers given to `app.websocket()`) are also closed. Defaults to `false`. 
+If `closeServers` is set to `true` then underlying servers, such as the HTTP servers given to [app.websocket()](#app-websocket), are also closed. Defaults to `false`. 
 
 
 </section>
@@ -791,17 +795,6 @@ peer.data['role'] = 'admin';
 ```
 
 
-#### peer.connected
-{: #peer-connected .code}
-
-Boolean flag indicating whether the peer is currently connected or not. Useful when handling a peer after an asynchronous operation which may take some time, so the peer may have disconnected in the meanwhile.
-
-```javascript
-peer.connected;
-// => true
-```
-
-
 </section>
 
 
@@ -811,12 +804,20 @@ peer.connected;
 <section markdown='1'>
 
 
-#### peer.send(req)
+#### peer.send(msg)
 {: #peer-send .code}
 
-Sends the given Protoo [request](#req) to the peer.
+Sends the given Protoo [request](#req) or [response](#res) to the peer.
 
 Check the usage example in [app.peers()](#app-peers).
+
+
+#### peer.cancel(req, [endRequest])
+{: #peer-cancel .code}
+
+Cancels the ongoing client transaction for the given [request](#req) (previously sent with [peer.send()](#peer-send)).
+
+If `endRequest` is given and the request method is 'session', it will be sent to the peer.
 
 
 #### peer.close([code], [reason])
@@ -846,10 +847,34 @@ When calling this method on a peer connected via WebSocket, the given `code` and
 The peer inherits from the Node [EventEmitter](https://nodejs.org/api/events.html#events_class_events_eventemitter) class. The list of emitted events is described below.
 
 
-#### peer.on('offline', callback())
-{: #peer-on-online .code}
+#### peer.on('disconnect', callback())
+{: #peer-on-disconnect .code}
 
-Emitted when the peer is disconnected.
+Emitted when the peer is disconnected. This event is just emitted in case the `disconnect grace period` setting has been set in the `app` (see [app configuration](#app-configuration-methods)).
+
+```javascript
+peer.on('disconnect', function() {
+    console.log('peer disconnected: %s', peer);
+});
+```
+
+
+#### peer.on('reconnect', callback())
+{: #peer-on-reconnect .code}
+
+Emitted when the peer reconnects. This event can only be emitted after a [disconnect](#peer-on-disconnect) event, and won't never be emitted after the [offline](#peer-on-offline) event.
+
+```javascript
+peer.on('reconnect', function() {
+    console.log('peer reconnected: %s', peer);
+});
+```
+
+
+#### peer.on('offline', callback())
+{: #peer-on-offline .code}
+
+Emitted when the peer becomes definitely offline. The peer is destroyed in this moment.
 
 ```javascript
 peer.on('offline', function() {
@@ -1016,7 +1041,7 @@ req.get('role');
 #### req.reply(status, [reason], [data])
 {: #req-reply .code}
 
-Sends a Protoo [response](#res) for this request. For more information check the Protoo's [protocol](/documentation/protocol) documentation.
+Generates and replies back a Protoo [response](#res) to this request. For more information check the Protoo's [protocol](/documentation/protocol) documentation.
 
 * `status`: A number indicating the status code (100-699).
 * `reason`: A descritive string.
@@ -1033,6 +1058,32 @@ Final responses are those with `status` between 200 and 699. If `reply()` is cal
 
 `next()` is ignored if called after replying a request with a final response.
 </div>
+
+
+#### req.reply(res)
+{: #req-reply-2 .code}
+
+Sends the given Protoo [response](#res) to the request sender. Useful to forward incoming responses from the destination peer.
+
+```javascript
+req.on('incomingResponse', function(res) {
+    req.reply(res);
+});
+```
+
+
+#### req.createResponse(status, [reason], [data])
+{: #req-createResponse .code}
+
+Creates and returns a Protoo [response](#res) for this request.
+
+* `status`: A number indicating the status code (100-699).
+* `reason`: A descritive string.
+* `data`: An optional object with custom fields.
+
+```javascript
+var res = req.createResponse(500, 'Internal Error');
+```
 
 
 </section>
@@ -1053,18 +1104,30 @@ The request inherits from the Node [EventEmitter](https://nodejs.org/api/events.
 Emitted for each response generated by Protoo during the request routing process by means of [req.reply()](#req-reply). The [Response](#res) instance is given as callback parameter.
 
 ```javascript
-app.use(function(req, next) {
-    req.on('outgoingResponse', function(res) {
-        console.log('replying %d response', res.status);
-    });
-
-    req.reply(100, 'trying');
-    req.reply(200, 'ok');
+req.on('outgoingResponse', function(res) {
+    console.log('replying %d response', res.status);
 });
+
+req.reply(100, 'trying');
+req.reply(200, 'ok');
 
 // => "replying 100 response"
 // => "replying 200 response"
 ```
+
+
+#### req.on('incomingResponse', callback(res, local))
+{: #req-on-incomingResponse .code}
+
+Emitted for each response received from the remote peer. The [Response](#res) instance is given as callback parameter. The second parameter `local` indicates whether the response was artificially generated by the client transaction due to sending error or timeout.
+
+```javascript
+req.on('incomingResponse', function(res, local) {
+    // Forward the response to the sender peer.
+    req.reply(res);
+});
+```
+
 
 </section>
 
@@ -1140,3 +1203,21 @@ An object with the required data for specific method and usages. Optional field 
 res.data;
 // => { foo: 1234 }
 ```
+
+
+#### res.isProvisional
+{: #res-isProvisional .code}
+
+Boolean indicating whether this is a provisional response (`status` between 100 and 199).
+
+
+#### res.isAccept
+{: #res-isAccept .code}
+
+Boolean indicating whether this is a final accept response (`status` between 200 and 299).
+
+
+#### res.isReject
+{: #res-isReject .code}
+
+Boolean indicating whether this is a final reject response (`status` between 300 and 699).
