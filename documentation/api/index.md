@@ -270,7 +270,7 @@ app.websocket(httpServer, function(info, accept, reject) {
 
     // Let the client choose his username and uuid and indicate them in the
     // URL query.
-    var u = url.parse(req.url, true);
+    var u = url.parse(info.req.url, true);
     var username = u.query.username;
     var uuid = u.query.uuid;
 
