@@ -494,10 +494,10 @@ app.route('/users/:username/:uuid?')
 Creates a router that inherits settings from the `app`. Check the [Router](#router) documentation for detailed information.
 
 
-#### app.peers(username, [[uuid], function])
+#### app.peers(username, uuid, function) / app.peers(username, function) / app.peers(function)
 {: #app-peers .code}
 
-Returns the number of online peers matching the given `username` and (optional) `uuid`, and run the given handler `function` for all of them.
+Returns the number of online peers matching the optional `username` and `uuid`, and run the given handler `function` for all of them. If nor `username` nor `uuid` is provided, all the peers are retrieved and the function returns the total number of them.
 
 The optional `function` is called with each retrieved [Peer](#peer) instance as argument.
 
