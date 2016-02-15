@@ -581,13 +581,13 @@ app.on('offline', function(peer) {
 ```
 
 
-#### app.on('routingError', callback(error))
-{: #app-on-routingError .code}
+#### app.on('routingerror', callback(error))
+{: #app-on-routingerror .code}
 
 Emitted when an error throws in runtime while routing/dispatching a request. The `Error` instance is given as callback parameter.
 
 ```javascript
-app.on('routingError', function(error) {
+app.on('routingerror', function(error) {
     console.error('routing error: %s', error);
 });
 ```
